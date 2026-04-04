@@ -2,7 +2,7 @@
 
 This is a fun learning project that might help bring spicy pickles to good folks!
 
-## 🚀 Project Overview
+## 🥒 Project Overview
 Pickles is a minimal FastAPI application designed for experimentation and learning. The goal is to explore modern Python web development while having fun.
 
 ## 🛠️ Setup
