@@ -3,14 +3,14 @@
 This is a fun learning project that might help bring spicy pickles to good folks!
 
 ## 🥒 Project Overview
-Pickles is a minimal FastAPI application designed for experimentation and learning. The goal is to explore modern Python web development while having fun.
+Pickles is a minimal FastAPI application designed for fun, experimentation and learning. The goal is to explore modern Python web development while having some... pickles.
 
 ## 🛠️ Setup
 1. Clone this repository:
-	```bash
-	git clone <repo-url>
-	cd Pickles
-	```
+   ```bash
+   git clone https://github.com/vs3kulic/Pickles.git
+   cd Pickles
+   ```
 2. (Recommended) Create and activate a virtual environment:
 	```bash
 	python -m venv venv
