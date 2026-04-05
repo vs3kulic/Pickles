@@ -19,11 +19,7 @@ client = TestClient(app)
 # TEST CASES #
 ##############
 
-def test_root_returns_ok():
-    response = client.get("/")
+def test_health_returns_ok():
+    response = client.get("/health")
     assert response.status_code == 200
-
-def test_root_returns_text_html():
-    response = client.get("/")
-    expected_type = "text/html"
-    assert expected_type in response.headers["content-type"]
+    assert response.json() == {"status": "ok", "message": "The Pickles API is available."}
