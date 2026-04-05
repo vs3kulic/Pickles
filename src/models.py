@@ -16,7 +16,6 @@
 # [ ] Class method: from_dict(data: dict) -> Product
 # [ ] (Optional) Abstract base class for shared model methods (e.g., to_dict, from_dict)
 
-
 class Product:
     pass
 
