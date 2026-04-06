@@ -36,11 +36,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Document folders
-data/processed/
-data/raw/
-archive/
-docs/
+# Google service account
+*.json
 
 # Config files with sensitive mappings
 config/
