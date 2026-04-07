@@ -11,11 +11,10 @@ from models import Product
 
 def test_product_creation():
     dummy = Product("1", "spicy_pickles", "Gurke, würzig", "Single unit of spicy pickles", True)
-    # TODO: add @property getters for all fields in Product and update the test to use them
-    assert dummy._product_id == "1"
-    assert dummy._product_name == "spicy_pickles"
-    assert dummy._product_display_name == "Gurke, würzig"
-    assert dummy._product_description == "Single unit of spicy pickles"
-    assert dummy._product_is_active == True
+    assert dummy.product_id == "1"
+    assert dummy.product_name == "spicy_pickles"
+    assert dummy.product_display_name == "Gurke, würzig"
+    assert dummy.product_description == "Single unit of spicy pickles"
+    assert dummy.product_is_active
 
 # TODO: add further tests for repr and str

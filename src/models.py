@@ -18,37 +18,61 @@ class Product:
     
     def __init__(self,
                 product_id: str,
-                product_name: str,
+                product_key: str,
                 product_display_name: str | None = None,
                 product_description: str | None = None,
                 product_is_active: bool = True
     ) -> None:
         self._product_id = product_id
-        self._product_name = product_name
+        self._product_key = product_key
         self._product_display_name = product_display_name
         self._product_description = product_description
         self._product_is_active = product_is_active
 
     def __repr__(self) -> str:
-        return f"Product('{self._product_id}', ‘{self._product_name}‘, {self._product_is_active})"
+        return f"Product('{self._product_id}', ‘{self._product_key}‘, {self._product_is_active})"
 
     def __str__(self) -> str:
         return (
             "Product Details: \n"
             f"{'--'* 14} \n"
-            f"Id:           {self._product_id} \n"
-            f"Name:         {self._product_name} \n"
-            f"Display name: {self._product_display_name} \n"
-            f"Description:  {self._product_description} \n"
-            f"Is active:    {self._product_is_active} \n"
+            f"Id:           {self._product_id}\n"
+            f"Key:          {self._product_key}\n"
+            f"Display name: {self._product_display_name}\n"
+            f"Description:  {self._product_description}\n"
+            f"Is active:    {self._product_is_active}\n"
         )
+
+    @property
+    def product_id(self) -> str:
+        return self._product_id
+
+    @property
+    def product_key(self) -> str:
+        return self._product_key
+
+    @property
+    def product_display_name(self) -> str | None:
+        return self._product_display_name
+
+    @property
+    def product_description(self) -> str | None:
+        return self._product_description
+
+    @property
+    def product_is_active(self) -> bool:
+        return self._product_is_active
+
+    @product_is_active.setter
+    def product_is_active(self, value: bool):
+        self._product_is_active = value
 
 
 # ====================
 # Task 2: Order Class
 # ====================
 # [ ] Implement an Order class with:
-#     - Fields: order_id (str), customer_name (str), contact (str), product_id (str), quantity (int), timestamp (str), status (str)
+#     - Fields: order_id (str), customer_name (str), contact (str), product_id (str), quantity (int), timestamp (datetime), status (str)
 # [ ] __init__ method to set all fields
 # [ ] to_dict() -> dict: returns a dictionary representation
 # [ ] from_dict(data: dict) -> Order: classmethod to create an Order from a dict
@@ -66,6 +90,7 @@ def main():
     """Main function to demo the models."""
     p1 = Product("4", "gnarly_pickles", product_is_active=False)
     print(repr(p1))
+    p1.product_is_active = True
     print(p1)
 
 if __name__ == "__main__":
