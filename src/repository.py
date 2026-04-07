@@ -10,17 +10,17 @@
 # Create an abstract base class "Repository" that defines a common interface
 # for all storage backends. The class should have the following:
 #
-# > "__init__(self, name: str)": Initializes the repository with a name
+# [x] "__init__(self, name: str)": Initializes the repository with a name
 #   (e.g. "products" or "orders"). Store it as an instance attribute.
 #
-# > "save(self, data: dict) -> None": An abstract method. Subclasses must
+# [x] "save(self, data: dict) -> None": An abstract method. Subclasses must
 #   override this to store the given dict somewhere.
 #   Raise a TypeError if "data" is not a dict.
 #
-# > "load(self) -> list[dict]": An abstract method. Subclasses must override
+# [x] "load(self) -> list[dict]": An abstract method. Subclasses must override
 #   this to retrieve and return data from storage.
 #
-# > "__str__(self)": Returns a human-readable string describing the repository,
+# [x] "__str__(self)": Returns a human-readable string describing the repository,
 #   e.g. "Repository(name='products')"
 #
 # Attempting to create a "Repository" object directly should raise a TypeError.
@@ -28,6 +28,25 @@
 # Tip: use the "abc" module (ABC, abstractmethod).
 
 # Your code here #
+from abc import ABC, abstractmethod
+
+class Repository(ABC):
+
+    def __init__(self, name: str):
+        self._name = name
+
+    @abstractmethod
+    def save(self, data: dict) -> None:
+        if not isinstance(data, dict):
+            raise TypeError(f"Save method expects a dict, got {type(dict).__name__}")
+        raise NotImplementedError
+
+    @abstractmethod
+    def load(self) -> list[dict]:
+        raise NotImplementedError
+
+    def __str__(self):
+        return f"Repository(name={self._name})"
 
 
 #

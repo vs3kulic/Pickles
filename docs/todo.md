@@ -44,14 +44,14 @@ The point is to keep it fun, simple, and backend-focused.
 
 
 ## Google Sheets
-- [ ] Create one spreadsheet
-- [ ] Add `products` sheet
+- [x] Create one spreadsheet
+- [x] Add `products` sheet
 - [ ] Add `orders` sheet
 - [ ] Add `inventory` sheet
 - In `products`, store:
-  - [ ] product_id
-  - [ ] name
-  - [ ] active
+  - [x] product_id
+  - [x] name
+  - [x] active
 - In `inventory`, store:
   - [ ] product_id
   - [ ] stock
@@ -64,10 +64,10 @@ The point is to keep it fun, simple, and backend-focused.
   - [ ] product_id
   - [ ] quantity
   - [ ] status
-- [ ] Enable Google Sheets API in Google Cloud
-- [ ] Create credentials/service account
-- [ ] Share sheet with service account
-- [ ] Store credentials securely in backend environment variables
+- [x] Enable Google Sheets API in Google Cloud
+- [x] Create credentials/service account
+- [x] Share sheet with service account
+- [x] Store credentials securely in backend environment variables
 
 
 ## Order flow

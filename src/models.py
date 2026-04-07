@@ -11,7 +11,7 @@
 # [ ] to_row() -> list: returns data as a list matching sheet column order (for gspread writes)
 # [ ] to_dict() -> dict: returns data as a dict matching sheet column names (for API responses)
 # [ ] Class method: from_dict(data: dict) -> Product (handle active: 1/0 -> bool conversion)
-# [ ] Getters and setters for fields (use @property)
+# [x] Getters and setters for fields (use @property)
 # [ ] Static method: validate_product_data(data: dict) -> bool
 
 class Product:
