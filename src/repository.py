@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import gspread
+import os
 
 # ========================
 # Task 5: Repository Layer
@@ -60,11 +62,15 @@ class Repository(ABC):
 # Never hardcode credentials or store the key file in the repo.
 # Both Google Sheets API and Google Drive API must be enabled in your project.
 #
-# > "__init__(self, name: str, sheet_name: str)":
-#   Initializes the repository with a name (e.g. "products") and the Google
-#   Sheet document name (e.g. "Pickles DB"). Authenticates using gspread and
-#   opens the worksheet tab matching 'name'.
-#   Store the worksheet as an instance attribute.
+# > "__init__(self, tab_name: str, document: str)":
+#   Initializes the repository with a tab name (e.g. "products") and the Google
+#   Sheet document name (e.g. "Pickles DB"). Delegates authentication and
+#   worksheet setup to the private helper "_connect()".
+#
+# > "_connect(self) -> None":
+#   Private helper called by "__init__". Loads credentials from the environment,
+#   authenticates with gspread, opens the document, and stores the worksheet
+#   tab as "self._worksheet".
 #
 # > "save(self, data: dict) -> None": Appends the given dict as a new row to
 #   the worksheet. The dict values form the data row.
@@ -80,3 +86,24 @@ class Repository(ABC):
 #   "GoogleSheetsRepository(name='products', sheet_name='Pickles DB')"
 
 # Your code here #
+class GoogleSheetsRepository(Repository):
+
+    def __init__(self, tab_name: str, document: str):
+        super().__init__(tab_name)  # represents what the repository manages (tab -> entity name)
+        self._document = document
+        self._connect()             # helper method for authentication
+
+    def _connect(self) -> None:
+        # TODO: Load credentials from environment variable
+        # TODO: Authenticate with Google using the service account credentials
+        # TODO: Open the sheet document, then the specific worksheet tab
+
+    def save(self, data: dict) -> None:
+        pass
+
+    def load(self) -> list[dict]:
+        pass
+
+    def __str__(self) -> str:
+        pass
+
