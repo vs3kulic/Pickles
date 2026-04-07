@@ -83,8 +83,8 @@ The point is to keep it fun, simple, and backend-focused.
 - [x] Create backend repo
 - [x] Push FastAPI code to GitHub
 - [x] Create Render web service from repo
-- [ ] Add environment variables for Google credentials
-- [ ] Deploy and test public API URL
+- [x] Add environment variables for Google credentials
+- [x] Deploy and test public API URL
 
 
 ## Nice-to-have later

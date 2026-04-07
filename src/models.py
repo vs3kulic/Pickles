@@ -21,7 +21,7 @@ class Product:
                 product_key: str,
                 product_display_name: str | None = None,
                 product_description: str | None = None,
-                product_is_active: bool = True
+                product_is_active: bool = False
     ) -> None:
         self._product_id = product_id
         self._product_key = product_key
@@ -30,7 +30,7 @@ class Product:
         self._product_is_active = product_is_active
 
     def __repr__(self) -> str:
-        return f"Product('{self._product_id}', ‘{self._product_key}‘, {self._product_is_active})"
+        return f"Product('{self._product_id}', '{self._product_key}', {self._product_is_active})"
 
     def __str__(self) -> str:
         return (
