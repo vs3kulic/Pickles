@@ -18,29 +18,42 @@ SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
 from models import Product
+import pytest
+
+# pylint: disable=redefined-outer-name
+
+
+############
+# FIXTURES #
+############
+
+@pytest.fixture
+def min_dummy():
+    return Product(product_id="3", product_key="fusion_pickles")
+
+
+@pytest.fixture
+def max_dummy():
+    return Product("3", "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
 
 
 ##############
 # TEST CASES #
 ##############
 
-def test_product_creation():
-    dummy = Product("1", "spicy_pickles", "Gurke, würzig", "Single unit of spicy pickles", True)
-    assert dummy.product_id == "1"                                      # Mandatory attribute
-    assert dummy.product_key == "spicy_pickles"                         # Mandatory attribute
-    assert dummy.product_display_name == "Gurke, würzig"                # Optional attribute
-    assert dummy.product_description == "Single unit of spicy pickles"  # Optional attribute
-    assert dummy.product_is_active                                      # default=False
+def test_product_creation(max_dummy):
+    assert max_dummy.product_id == "3"                                          # Mandatory attribute
+    assert max_dummy.product_key == "spicy_pickles"                             # Mandatory attribute
+    assert max_dummy.product_display_name == "Gurke, exotisch"                  # Optional attribute
+    assert max_dummy.product_description == "Single unit of fusion pickles"     # Optional attribute
+    assert max_dummy.product_is_active                                          # default=False
 
 
-# TODO: add further tests for repr and str
-def test_product_repr():
-    dummy = Product(product_id="2", product_key="classic_pickles", product_is_active=True)
-    assert repr(dummy) == "Product('2', 'classic_pickles', True)"
+def test_product_repr(min_dummy):
+    assert repr(min_dummy) == "Product('3', 'fusion_pickles', False)"
 
 
-def test_product_str():
-    dummy = Product(product_id="3", product_key="fusion_pickles")
+def test_product_str(min_dummy):
     expected = (
             "Product Details: \n"
             f"{'--'* 14} \n"
@@ -50,35 +63,29 @@ def test_product_str():
             f"Description:  None\n"
             f"Is active:    False\n"
     )
-    assert str(dummy) == expected
+    assert str(min_dummy) == expected
 
 
-def test_product_id_getter():
-    dummy = Product(product_id="3", product_key="fusion_pickles")
-    assert dummy.product_id == "3"
+def test_product_id_getter(min_dummy):
+    assert min_dummy.product_id == "3"
 
 
-def test_product_key_getter():
-    dummy = Product(product_id="3", product_key="fusion_pickles")
-    assert dummy.product_key == "fusion_pickles"
+def test_product_key_getter(min_dummy):
+    assert min_dummy.product_key == "fusion_pickles"
 
 
-def test_product_display_name_getter():
-    dummy = Product("3", "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
-    assert dummy.product_display_name == "Gurke, exotisch"
+def test_product_display_name_getter(max_dummy):
+    assert max_dummy.product_display_name == "Gurke, exotisch"
 
 
-def test_product_description_getter():
-    dummy = Product("3", "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
-    assert dummy.product_description == "Single unit of fusion pickles"
+def test_product_description_getter(max_dummy):
+    assert max_dummy.product_description == "Single unit of fusion pickles"
 
 
-def test_product_is_active_getter():
-    dummy = Product(product_id="3", product_key="fusion_pickles")
-    assert not dummy.product_is_active
+def test_product_is_active_getter(min_dummy):
+    assert not min_dummy.product_is_active
 
 
-def test_product_is_active_setter():
-    dummy = Product(product_id="3", product_key="fusion_pickles")
-    dummy.product_is_active = True
-    assert dummy.product_is_active
+def test_product_is_active_setter(min_dummy):
+    min_dummy.product_is_active = True
+    assert min_dummy.product_is_active
