@@ -83,27 +83,44 @@ class Repository(ABC):
 #   Handle gspread API errors gracefully.
 #
 # > "__str__(self)": Returns a string like:
-#   "GoogleSheetsRepository(name='products', sheet_name='Pickles DB')"
+#   "GoogleSheetsRepository(document='Pickles DB', worksheet='products')"
 
 # Your code here #
 class GoogleSheetsRepository(Repository):
 
-    def __init__(self, tab_name: str, document: str):
-        super().__init__(tab_name)  # represents what the repository manages (tab -> entity name)
+    def __init__(self, document: str, worksheet: str):
+        super().__init__(worksheet)                     # represents entity, stored as self._name
         self._document = document
-        self._connect()             # helper method for authentication
+        gdoc = self._connect()                          # call the helper to open the db
+        self._worksheet = gdoc.worksheet(worksheet)     # returns a live gspread Worksheet object
 
-    def _connect(self) -> None:
-        # TODO: Load credentials from environment variable
-        # TODO: Authenticate with Google using the service account credentials
-        # TODO: Open the sheet document, then the specific worksheet tab
-
-    def save(self, data: dict) -> None:
-        pass
+    def _connect(self):
+        creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        gclient = gspread.service_account(filename=creds_path)
+        return gclient.open(self._document)
 
     def load(self) -> list[dict]:
-        pass
+        # TODO: Handle gspread API errors gracefully
+        return self._worksheet.get_all_records()
+
+    def save(self, data: dict) -> None:
+        # TODO: Raise TypeError if data is not a dict
+        # TODO: Handle gspread API errors gracefully
+        self._worksheet.append_row(list(data.values()))
 
     def __str__(self) -> str:
-        pass
+        return f"GoogleSheetsRepository(document={self._document}, worksheet={self._worksheet})"
 
+
+def main():
+    """Main function to demo the repository implementation."""
+    g1 = GoogleSheetsRepository("Pickles DB", "products")
+    products = g1.load()
+
+    for product in products:
+        for key, value in product.items():
+            print(f"{key}: {value}")
+        print()
+
+if __name__ == "__main__":
+    main()
