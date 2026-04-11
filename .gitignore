@@ -41,3 +41,6 @@ MANIFEST
 
 # Config files with sensitive mappings
 config/
+
+# Archive
+ZZ-Archive/
