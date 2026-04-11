@@ -10,61 +10,78 @@ class Repository(ABC):
 
     def __init__(self, name: str):
         self._name = name
+    
+    @abstractmethod
+    def load(self) -> list[dict]:
+        """Return all records."""
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
     def save(self, data: dict) -> None:
         """Persist one record."""
         raise NotImplementedError("Subclasses must implement this method.")
 
-    @abstractmethod
-    def load(self) -> list[dict]:
-        """Return all records."""
-        raise NotImplementedError("Subclasses must implement this method.")
-
     def __str__(self):
         return f"Repository(name={self._name})"
 
 
+class GoogleSheetsConnector:
+
+    def __init__(self, document: str):
+        self._document = document
+        gclient = self._authenticate()
+        self._gdoc = gclient.open(self._document)
+
+    def _authenticate(self):
+        creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        if not creds_path:
+            raise EnvironmentError("GOOGLE_APPLICATION_CREDENTIALS is not set.")
+        if not creds_path or not os.path.exists(creds_path):
+            raise FileNotFoundError(f"Credentials file not found: {creds_path}")
+        return gspread.service_account(filename=creds_path)
+
+    def get_worksheet(self, name: str) -> gspread.Worksheet:
+        try:
+            return self._gdoc.worksheet(name)
+        except gspread.WorksheetNotFound as e:
+            raise ValueError(
+                f"Worksheet {name} not found in {self._document}."
+            ) from e
+
+    def __str__(self) -> str:
+        return f"GoogleSheetsConnector(document='{self._document}')"
+
+
 class GoogleSheetsRepository(Repository):
 
-    def __init__(self, document: str, entity: str):
-        super().__init__(entity)  # represents entity, stored as self._name
-        self._document = document
-        gdoc = self._connect()  # call the helper to open the db
-        self._worksheet = gdoc.worksheet(self._name)  # returns gspread object
-
-    def _connect(self) -> gspread.Spreadsheet:
-        creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-        gclient = gspread.service_account(filename=creds_path)
-        return gclient.open(self._document)
+    def __init__(self, connector: GoogleSheetsConnector, entity: str):
+        super().__init__(entity)
+        self._connector = connector
+        self._worksheet = connector.get_worksheet(entity)
 
     def load(self) -> list[dict]:
-        try:
-            return self._worksheet.get_all_records()
-        except gspread.exceptions.APIError as e:
-            raise RuntimeError(f"Failed to load '{self._name}': {e}") from e
+        return self._worksheet.get_all_records()
 
     def save(self, data: dict) -> None:
         """
         Persist one record.
-        
+
         Args:
             data: The record to persist. Keys must match the worksheet
-            column headers, in the same order.
-        
+                column headers, values are written in column order.
+
         Raises:
             TypeError: If data is not a dictionary.
-            RuntimeError: If an API error occurs.
         """
         if not isinstance(data, dict):
             raise TypeError(f"'data' must be a dict, got {type(data).__name__}")
-        try:
-            self._worksheet.append_row(list(data.values()))
-        except gspread.exceptions.APIError as e:
-            raise RuntimeError(f"Failed to save to '{self._name}': {e}") from e
+
+        headers = self._worksheet.row_values(1)
+        row = [data[header] for header in headers]
+        self._worksheet.append_row(row)
 
     def __str__(self) -> str:
         return (f"GoogleSheetsRepository("
-                f"document='{self._document}', "
+                f"connector='{self._connector}', "
                 f"worksheet='{self._name}')"
         )

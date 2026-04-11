@@ -17,7 +17,7 @@
 class Product:
     
     def __init__(self,
-                product_id: str,
+                product_id: int,
                 product_key: str,
                 product_display_name: str | None = None,
                 product_description: str | None = None,
@@ -30,7 +30,7 @@ class Product:
         self._product_is_active = product_is_active
 
     def __repr__(self) -> str:
-        return f"Product('{self._product_id}', '{self._product_key}', {self._product_is_active})"
+        return f"Product({self._product_id}, '{self._product_key}', {self._product_is_active})"
 
     def __str__(self) -> str:
         return (
@@ -44,7 +44,7 @@ class Product:
         )
 
     @property
-    def product_id(self) -> str:
+    def product_id(self) -> int:
         return self._product_id
 
     @property

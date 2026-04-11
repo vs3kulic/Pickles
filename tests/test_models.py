@@ -29,12 +29,12 @@ import pytest
 
 @pytest.fixture
 def min_dummy():
-    return Product(product_id="3", product_key="fusion_pickles")
+    return Product(product_id=3, product_key="fusion_pickles")
 
 
 @pytest.fixture
 def max_dummy():
-    return Product("3", "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
+    return Product(3, "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
 
 
 ##############
@@ -42,7 +42,7 @@ def max_dummy():
 ##############
 
 def test_product_creation(max_dummy):
-    assert max_dummy.product_id == "3"                                          # Mandatory attribute
+    assert max_dummy.product_id == 3                                            # Mandatory attribute
     assert max_dummy.product_key == "spicy_pickles"                             # Mandatory attribute
     assert max_dummy.product_display_name == "Gurke, exotisch"                  # Optional attribute
     assert max_dummy.product_description == "Single unit of fusion pickles"     # Optional attribute
@@ -50,7 +50,7 @@ def test_product_creation(max_dummy):
 
 
 def test_product_repr(min_dummy):
-    assert repr(min_dummy) == "Product('3', 'fusion_pickles', False)"
+    assert repr(min_dummy) == "Product(3, 'fusion_pickles', False)"
 
 
 def test_product_str(min_dummy):
@@ -67,7 +67,7 @@ def test_product_str(min_dummy):
 
 
 def test_product_id_getter(min_dummy):
-    assert min_dummy.product_id == "3"
+    assert min_dummy.product_id == 3
 
 
 def test_product_key_getter(min_dummy):
