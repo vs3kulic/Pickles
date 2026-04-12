@@ -81,7 +81,7 @@ class GoogleSheetsRepository(Repository):
         self._worksheet.append_row(row)
 
     def __str__(self) -> str:
-        return (f"GoogleSheetsRepository("
+        return ("GoogleSheetsRepository("
                 f"connector='{self._connector}', "
                 f"worksheet='{self._name}')"
         )
