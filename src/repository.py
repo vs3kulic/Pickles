@@ -36,7 +36,7 @@ class GoogleSheetsConnector:
         creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         if not creds_path:
             raise EnvironmentError("GOOGLE_APPLICATION_CREDENTIALS is not set.")
-        if not creds_path or not os.path.exists(creds_path):
+        if not os.path.exists(creds_path):
             raise FileNotFoundError(f"Credentials file not found: {creds_path}")
         return gspread.service_account(filename=creds_path)
 
