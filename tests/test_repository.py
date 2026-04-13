@@ -71,15 +71,6 @@ def test_save_respects_column_order(mock_connector):
     worksheet.append_row.assert_called_once_with(["dill", 5])
 
 
-def test_save_invalid_data(mock_connector: MagicMock):
-    connector, _ = mock_connector
-
-    repo = GoogleSheetsRepository(connector, "products")
-
-    with pytest.raises(TypeError):
-        repo.save([5, "fusion_pickles"])
-
-
 def test_save_ignores_extra_keys(mock_connector):
     connector, worksheet = mock_connector
     worksheet.row_values.return_value = ["product_id", "product_key"]
@@ -88,6 +79,15 @@ def test_save_ignores_extra_keys(mock_connector):
     repo.save({"product_id": 5, "product_key": "dill", "extra": "ignored"})
 
     worksheet.append_row.assert_called_once_with([5, "dill"])
+
+
+def test_save_invalid_data(mock_connector: MagicMock):
+    connector, _ = mock_connector
+
+    repo = GoogleSheetsRepository(connector, "products")
+
+    with pytest.raises(TypeError):
+        repo.save([5, "fusion_pickles"])
 
 
 def test_repository_str(mock_connector: MagicMock):
