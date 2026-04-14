@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Add Product</title>
+    <link rel="stylesheet" href="static/admin.css">
+</head>
+<body>
+    <h1>Add New Product</h1>
+    <form id="add-product-form" method="post" action="/api/products">
+        <label>
+            Product ID:
+            <input type="number" name="product_id" required>
+        </label><br>
+        <label>
+            Product Key:
+            <input type="text" name="product_key" required>
+        </label><br>
+        <label>
+            Display Name:
+            <input type="text" name="product_display_name" required>
+        </label><br>
+        <label>
+            Description:
+            <input type="text" name="product_description" required>
+        </label><br>
+        <label>
+            Is Active:
+            <input type="checkbox" name="product_is_active">
+        </label><br>
+        <button type="submit">Add Product</button>
+    </form>
+</body>
+</html>
