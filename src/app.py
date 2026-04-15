@@ -70,7 +70,7 @@ async def add_product(
     return {"status": "success"}
 
 
-@app.post("/api/inventory")
+@app.post("/api/inventory/add")
 async def add_to_stock(
     product_id: int = Form(...),
     product_key: str = Form(...),
@@ -83,4 +83,18 @@ async def add_to_stock(
         "product_key": product_key,
         "product_quantity": product_quantity
     })
+    return {"status": "success"}
+
+
+@app.post("/api/inventory/reduce")
+async def reduce_stock(
+    product_id: int = Form(...),
+    product_key: str = Form(...),
+    reduce_quantity: int = Form(...)
+) -> dict:
+    connector = GoogleSheetsConnector("Pickles DB")
+    repo = GoogleSheetsRepository(connector, "inventory")
+    # TODO: implement logic to find the row and update product_quantity
+    # (not just append a new row)
+    # Example: load all, find product_id, update quantity, write back
     return {"status": "success"}

@@ -24,23 +24,31 @@ from models import Product
 
 class Inventory:
 
-    def __init__(self, products=None):
-        self._products = products if products is not None else {}
+    def __init__(
+        self,
+        quantities: dict | None = None,
+    ):
+        self._quantities = quantities if quantities is not None else {}
 
-    def add_product(self, product: Product):
-        # Store product in inventory, using product_id as key
-        self._products[product.product_id] = product
+    def add_stock(self, product_id: int, amount: int) -> None:
+        self._quantities[product_id] = self._quantities.get(product_id, 0) + amount
 
-    # TODO: Reduce the stock
-    def reduce_stock(self, product_id: int, amount: int = 1):
-        # TODO: Get the product from the inventory
-        # TODO: Check if product_id exists (KeyError)
-        # TODO: Check if enough quantity (ValueError)
-        # TODO: Reduce the quantity
-        pass
+    def get_stock(self, product_id: int) -> int:
+        return self._quantities.get(product_id, 0)
+
+    def reduce_stock(self, product_id: int, amount: int = 1) -> None:
+        if product_id not in self._quantities:
+            raise KeyError(f"Product {product_id} not found in inventory.")
+        if self._quantities[product_id] < amount:
+            raise ValueError(f"Not enough stock for product {product_id}.")
+        self._quantities[product_id] -= amount
+
+    def list_inventory(self):
+        # Returns a list of (product_id, quantity) tuples
+        return list(self._quantities.items())
 
     def __repr__(self):
-        return f"Inventory({self._products})"
+        return f"Inventory(quantities={self._quantities})"
 
 
 # =======================
@@ -52,17 +60,21 @@ class OrderManager:
 
 
 def main():
-    # Create some Product objects
-    p1 = Product(product_id=1, product_key="pickles")
-    p2 = Product(product_id=2, product_key="olives")
+    # Start with empty inventory
+    inv = Inventory()
+    print("Initial inventory:", inv.list_inventory())
 
-    products_dict = {
-        p1.product_id: p1,
-        p2.product_id: p2
-    }
+    # Add stock for both products
+    inv.add_stock(product_id=1, amount=10)
+    inv.add_stock(2, 5)
+    print("After adding stock:", inv.list_inventory())
 
-    inv = Inventory(products=products_dict)
-    print(repr(inv))
+    # Reduce stock for product 1
+    inv.reduce_stock(1, 3)
+    print("After reducing 3 from product 1:", inv.list_inventory())
+
+    # Get stock for product 2
+    print(f"Stock for product 2: {inv.get_stock(2)}")
 
 if __name__ == "__main__":
     main()

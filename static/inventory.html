@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="static/main.css">
 </head>
 <body>
-    <h1>Add Product to Stock</h1>
-    <form id="add-product-form" method="post" action="/api/inventory">
+    <h1>Inventory Stock Management</h1>
+    <form id="inventory-form">
         <label>
             Product ID:
             <input type="number" name="product_id" required>
@@ -18,9 +18,32 @@
         </label><br>
         <label>
             Quantity:
-            <input type="number" name="product_quantity" min="0" required>
+            <input type="number" name="product_quantity" min="1" required>
         </label><br>
-        <button type="submit">Add to Stock</button>
+        <button type="button" id="add-btn">Add to Stock</button>
+        <button type="button" id="reduce-btn">Reduce Stock</button>
     </form>
+
+    <script>
+    document.getElementById('add-btn').onclick = function() {
+        const form = document.getElementById('inventory-form');
+        const data = new FormData(form);
+        fetch('/api/inventory/add', {
+            method: 'POST',
+            body: new URLSearchParams(data)
+        }).then(r => r.json())
+        .then(data => alert(data.status || JSON.stringify(data)));
+    };
+    document.getElementById('reduce-btn').onclick = function() {
+        const form = document.getElementById('inventory-form');
+        const data = new FormData(form);
+        fetch('/api/inventory/reduce', {
+            method: 'POST',
+            body: new URLSearchParams(data)
+        }).then(r => r.json())
+        .then(data => alert(data.status || JSON.stringify(data)));
+    };
+    </script>
+
 </body>
 </html>
