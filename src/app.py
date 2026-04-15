@@ -78,23 +78,63 @@ async def add_to_stock(
 ) -> dict:
     connector = GoogleSheetsConnector("Pickles DB")
     repo = GoogleSheetsRepository(connector, "inventory")
-    repo.save({
-        "product_id": product_id,
-        "product_key": product_key,
-        "product_quantity": product_quantity
-    })
+
+    # Load current inventory
+    inventory_data = repo.load()
+
+    # Find the current quantity
+    quantities = {
+        int(row["product_id"]): int(row["product_quantity"])
+        for row in inventory_data
+    }
+    current_quantity = quantities.get(product_id)
+
+    # Update or save the quantity
+    if current_quantity is not None:
+        new_quantity = current_quantity + product_quantity
+        repo.update_quantity(product_id, new_quantity)
+    else:
+        repo.save({
+            "product_id": product_id,
+            "product_key": product_key,
+            "product_quantity": product_quantity
+        })
+
     return {"status": "success"}
 
 
 @app.post("/api/inventory/reduce")
 async def reduce_stock(
     product_id: int = Form(...),
-    product_key: str = Form(...),
     reduce_quantity: int = Form(...)
 ) -> dict:
     connector = GoogleSheetsConnector("Pickles DB")
     repo = GoogleSheetsRepository(connector, "inventory")
-    # TODO: implement logic to find the row and update product_quantity
-    # (not just append a new row)
-    # Example: load all, find product_id, update quantity, write back
-    return {"status": "success"}
+
+    # Load current inventory
+    inventory_data = repo.load()
+
+    # Find the current quantity
+    quantities = {
+        int(row["product_id"]): int(row["product_quantity"])
+        for row in inventory_data
+    }
+    current_quantity = quantities.get(product_id)
+
+    # Check the quantity values
+    if current_quantity is None:
+        return {
+            "status": "error", "message": 
+            f"Product ID {product_id} not found in inventory."
+        }
+    if current_quantity < reduce_quantity:
+        return {
+            "status": "error", "message": 
+            f"Not enough stock for product {product_id}."
+        }
+
+    # Update the quantity
+    new_quantity = current_quantity - reduce_quantity
+    repo.update_quantity(product_id, new_quantity)
+
+    return {"status": "success", "new_quantity": new_quantity}

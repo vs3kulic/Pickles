@@ -7,7 +7,9 @@
 </head>
 <body>
     <h1>Inventory Stock Management</h1>
-    <form id="inventory-form">
+
+    <h2>Add to Stock</h2>
+    <form action="/api/inventory/add" method="post">
         <label>
             Product ID:
             <input type="number" name="product_id" required>
@@ -20,30 +22,25 @@
             Quantity:
             <input type="number" name="product_quantity" min="1" required>
         </label><br>
-        <button type="button" id="add-btn">Add to Stock</button>
-        <button type="button" id="reduce-btn">Reduce Stock</button>
+        <button type="submit">Add to Stock</button>
     </form>
 
-    <script>
-    document.getElementById('add-btn').onclick = function() {
-        const form = document.getElementById('inventory-form');
-        const data = new FormData(form);
-        fetch('/api/inventory/add', {
-            method: 'POST',
-            body: new URLSearchParams(data)
-        }).then(r => r.json())
-        .then(data => alert(data.status || JSON.stringify(data)));
-    };
-    document.getElementById('reduce-btn').onclick = function() {
-        const form = document.getElementById('inventory-form');
-        const data = new FormData(form);
-        fetch('/api/inventory/reduce', {
-            method: 'POST',
-            body: new URLSearchParams(data)
-        }).then(r => r.json())
-        .then(data => alert(data.status || JSON.stringify(data)));
-    };
-    </script>
+    <h2>Reduce Stock</h2>
+    <form action="/api/inventory/reduce" method="post">
+        <label>
+            Product ID:
+            <input type="number" name="product_id" required>
+        </label><br>
+        <label>
+            Product Key:
+            <input type="text" name="product_key" required>
+        </label><br>
+        <label>
+            Quantity to Reduce:
+            <input type="number" name="reduce_quantity" min="1" required>
+        </label><br>
+        <button type="submit">Reduce Stock</button>
+    </form>
 
 </body>
 </html>

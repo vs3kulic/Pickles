@@ -59,20 +59,25 @@ class GoogleSheetsRepository(Repository):
         self._connector = connector
         self._worksheet = connector.get_worksheet(entity)
 
+
     def load(self) -> list[dict]:
         return self._worksheet.get_all_records()
 
+    def update_quantity(self, product_id: int, new_quantity: int) -> None:
+        """Update the product_quantity for a given product_id."""
+        # Find the row with the given product_id
+        records = self._worksheet.get_all_records()
+        headers = self._worksheet.row_values(1)
+        qty_col = headers.index("product_quantity") + 1
+        for idx, record in enumerate(records, start=2):  # Data starts at row 2
+            if str(record["product_id"]) == str(product_id):
+                # Update the quantity in the correct cell
+                self._worksheet.update_cell(idx, qty_col, new_quantity)
+                return
+        raise ValueError(f"Product ID {product_id} not found in inventory.")
+
     def save(self, data: dict) -> None:
-        """
-        Persist one record.
-
-        Args:
-            data: The record to persist. Keys must match the worksheet
-                column headers, values are written in column order.
-
-        Raises:
-            TypeError: If data is not a dictionary.
-        """
+        """Persist one record."""
         if not isinstance(data, dict):
             raise TypeError(f"'data' must be a dict, got {type(data).__name__}")
 
