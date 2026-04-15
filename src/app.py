@@ -17,23 +17,33 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(__file__)
 static_dir = os.path.join(BASE_DIR, '..', 'static')
 index_path = os.path.join(static_dir, "index.html")
-admin_path = os.path.join(static_dir, "admin.html")
+products_path = os.path.join(static_dir, "products.html")
+inventory_path = os.path.join(static_dir, "inventory.html")
 
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-#################
-# API ENDPOINTS #
-#################
+###################
+# FRONTEND ROUTES #
+###################
 
 @app.get("/", response_class=FileResponse)
 async def root() -> str:
     return index_path
 
 
-@app.get("/admin", response_class=FileResponse)
-async def admin() -> str:
-    return admin_path
+@app.get("/products", response_class=FileResponse)
+async def products() -> str:
+    return products_path
 
+
+@app.get("/inventory", response_class=FileResponse)
+async def inventory() -> str:
+    return inventory_path
+
+
+#########################
+# BACKEND API ENDPOINTS #
+#########################
 
 @app.get("/health")
 async def health() -> dict:
@@ -56,5 +66,21 @@ async def add_product(
             "product_display_name": product_display_name,
             "product_description": product_description,
             "product_is_active": product_is_active
+    })
+    return {"status": "success"}
+
+
+@app.post("/api/inventory")
+async def add_to_stock(
+    product_id: int = Form(...),
+    product_key: str = Form(...),
+    product_quantity: int = Form(...)
+) -> dict:
+    connector = GoogleSheetsConnector("Pickles DB")
+    repo = GoogleSheetsRepository(connector, "inventory")
+    repo.save({
+        "product_id": product_id,
+        "product_key": product_key,
+        "product_quantity": product_quantity
     })
     return {"status": "success"}

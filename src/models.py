@@ -3,13 +3,7 @@
 # =====================
 # Task 1: Product Class
 # =====================
-# [x] Implement a Product class with:
-#     - Fields: product_id (str), product_name (str), product_display_name (str), product_description (str), product_is_active (bool)
-#     - Note: stock is managed by the Inventory class, not here
-# [x] __init__ method to set all fields
-# [x] __repr__ and __str__ for debugging
 # [ ] Class method: from_dict(data: dict) -> Product (handle active: 1/0 -> bool conversion)
-# [x] Getters and setters for fields (use @property)
 # [ ] Static method: validate_product_data(data: dict) -> bool
 
 class Product:
