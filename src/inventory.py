@@ -31,17 +31,14 @@ class Inventory:
         # Store product in inventory, using product_id as key
         self._products[product.product_id] = product
 
-    # TODO: review method
-    def remove_product(self, product_id: str):
-        self._products.pop(product_id, None)
+    # TODO: Reduce the stock
+    def reduce_stock(self, product_id: int, amount: int = 1):
+        # TODO: Get the product from the inventory
+        # TODO: Check if product_id exists (KeyError)
+        # TODO: Check if enough quantity (ValueError)
+        # TODO: Reduce the quantity
+        pass
 
-    # TODO: review method
-    def get_product(self, product_id: str):
-        return self._products.get(product_id)
-
-    def list_products(self):
-        return list(self._products.values())
-    
     def __repr__(self):
         return f"Inventory({self._products})"
 
