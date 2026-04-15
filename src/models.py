@@ -8,8 +8,6 @@
 #     - Note: stock is managed by the Inventory class, not here
 # [x] __init__ method to set all fields
 # [x] __repr__ and __str__ for debugging
-# [ ] to_row() -> list: returns data as a list matching sheet column order (for gspread writes)
-# [ ] to_dict() -> dict: returns data as a dict matching sheet column names (for API responses)
 # [ ] Class method: from_dict(data: dict) -> Product (handle active: 1/0 -> bool conversion)
 # [x] Getters and setters for fields (use @property)
 # [ ] Static method: validate_product_data(data: dict) -> bool
@@ -88,10 +86,14 @@ class Order:
 
 def main():
     """Main function to demo the models."""
+    # Product demo
     p1 = Product("4", "gnarly_pickles", product_is_active=False)
     print(repr(p1))
     p1.product_is_active = True
     print(p1)
+
+    # Order demo
+    pass
 
 if __name__ == "__main__":
     main()

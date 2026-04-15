@@ -19,3 +19,13 @@
 # [ ] Class method: from_dict(data: dict) to create an Inventory from a dictionary
 # [ ] (Optional) Use an abstract base class if you want to share methods across models
 
+class Inventory:
+    pass
+
+
+# =======================
+# Task 4: Order Manager
+# =======================
+
+class OrderManager:
+    pass

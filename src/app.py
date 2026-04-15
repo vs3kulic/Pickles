@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""This module contains the setup for the Pickles application."""
 
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
@@ -25,17 +26,17 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 #################
 
 @app.get("/", response_class=FileResponse)
-async def root():
+async def root() -> str:
     return index_path
 
 
 @app.get("/admin", response_class=FileResponse)
-async def admin():
+async def admin() -> str:
     return admin_path
 
 
 @app.get("/health")
-async def health():
+async def health() -> dict:
     return {"status": "ok", "message": "The Pickles API is available."}
 
 
@@ -46,7 +47,7 @@ async def add_product(
     product_display_name: str = Form(...),
     product_description: str = Form(...),
     product_is_active: bool = Form(False)
-):
+) -> dict:
     connector = GoogleSheetsConnector("Pickles DB")
     repo = GoogleSheetsRepository(connector, "products")
     repo.save({
