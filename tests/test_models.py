@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
-from models import Product
+from src.models import Product
 import pytest
 
 # pylint: disable=redefined-outer-name

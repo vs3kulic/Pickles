@@ -12,8 +12,8 @@ BASE_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
-from models import Product
-from repository import GoogleSheetsConnector, GoogleSheetsRepository
+from src.models import Product
+from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
 
 
 ############

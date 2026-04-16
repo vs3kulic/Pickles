@@ -4,7 +4,7 @@
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from utils import apply_quantity_change, get_product_repo
+from src.utils import apply_quantity_change, get_product_repo
 import os
 
 #############

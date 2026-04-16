@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
-from app import app
+from src.app import app
 
 client = TestClient(app)
 
