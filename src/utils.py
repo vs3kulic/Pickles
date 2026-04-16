@@ -2,15 +2,14 @@
 """This module contains utils for the Pickles application."""
 from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
 
-def get_product_repo():
+def get_repo(entity: str):
     connector = GoogleSheetsConnector("Pickles DB")
-    repo = GoogleSheetsRepository(connector, "products")
+    repo = GoogleSheetsRepository(connector, entity=entity)
     return repo
 
 
-def get_inventory_repo_and_quantities():
-    connector = GoogleSheetsConnector("Pickles DB")
-    repo = GoogleSheetsRepository(connector, "inventory")
+def get_quantities(entity: str):
+    repo = get_repo(entity=entity)
     inventory_data = repo.load()
     quantities = {
         int(row["product_id"]): int(row["product_quantity"])
@@ -25,7 +24,7 @@ def apply_quantity_change(
     change: int,
     action: str
 ) -> dict:
-    repo, quantities = get_inventory_repo_and_quantities()
+    repo, quantities = get_quantities("inventory")
     current_quantity = quantities.get(product_id)
 
     if action == "add":
