@@ -4,7 +4,7 @@
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
+from src.utils import apply_quantity_change, get_product_repo
 import os
 
 #############
@@ -50,7 +50,7 @@ async def health() -> dict:
     return {"status": "ok", "message": "The Pickles API is available."}
 
 
-@app.post("/api/products")
+@app.post("/api/products/add")
 async def add_product(
     product_id: int = Form(...),
     product_key: str = Form(...),
@@ -58,8 +58,7 @@ async def add_product(
     product_description: str = Form(...),
     product_is_active: bool = Form(False)
 ) -> dict:
-    connector = GoogleSheetsConnector("Pickles DB")
-    repo = GoogleSheetsRepository(connector, "products")
+    repo = get_product_repo()
     repo.save({
             "product_id": product_id,
             "product_key": product_key,
@@ -74,67 +73,24 @@ async def add_product(
 async def add_to_stock(
     product_id: int = Form(...),
     product_key: str = Form(...),
-    product_quantity: int = Form(...)
+    quantity: int = Form(...)
 ) -> dict:
-    connector = GoogleSheetsConnector("Pickles DB")
-    repo = GoogleSheetsRepository(connector, "inventory")
-
-    # Load current inventory
-    inventory_data = repo.load()
-
-    # Find the current quantity
-    quantities = {
-        int(row["product_id"]): int(row["product_quantity"])
-        for row in inventory_data
-    }
-    current_quantity = quantities.get(product_id)
-
-    # Update or save the quantity
-    if current_quantity is not None:
-        new_quantity = current_quantity + product_quantity
-        repo.update_quantity(product_id, new_quantity)
-    else:
-        repo.save({
-            "product_id": product_id,
-            "product_key": product_key,
-            "product_quantity": product_quantity
-        })
-
-    return {"status": "success"}
+    return apply_quantity_change(
+        product_id,
+        product_key,
+        quantity,
+        "add"
+    )
 
 
 @app.post("/api/inventory/reduce")
 async def reduce_stock(
     product_id: int = Form(...),
-    reduce_quantity: int = Form(...)
+    quantity: int = Form(...)
 ) -> dict:
-    connector = GoogleSheetsConnector("Pickles DB")
-    repo = GoogleSheetsRepository(connector, "inventory")
-
-    # Load current inventory
-    inventory_data = repo.load()
-
-    # Find the current quantity
-    quantities = {
-        int(row["product_id"]): int(row["product_quantity"])
-        for row in inventory_data
-    }
-    current_quantity = quantities.get(product_id)
-
-    # Check the quantity values
-    if current_quantity is None:
-        return {
-            "status": "error", "message": 
-            f"Product ID {product_id} not found in inventory."
-        }
-    if current_quantity < reduce_quantity:
-        return {
-            "status": "error", "message": 
-            f"Not enough stock for product {product_id}."
-        }
-
-    # Update the quantity
-    new_quantity = current_quantity - reduce_quantity
-    repo.update_quantity(product_id, new_quantity)
-
-    return {"status": "success", "new_quantity": new_quantity}
+    return apply_quantity_change(
+        product_id,
+        None,  # product_key is not needed for reduce
+        quantity,
+        "reduce"
+    )
