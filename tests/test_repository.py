@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """
-Unit tests for the GoogleSheetsRepository models.
+Unit tests for GoogleSheetsRepository.
+
+These tests verify the interface and behavior of the GoogleSheetsRepository
+    class using MagicMock for the connector and worksheet.
+
+Test coverage:
+- load: Loads records from the worksheet.
+- save: Appends rows in correct order; ignores extra keys.
+- save (invalid data): Raises TypeError for invalid input.
+- __str__: Returns expected string representation.
 """
 import pytest
 from unittest.mock import MagicMock, patch

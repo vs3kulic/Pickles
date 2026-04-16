@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""
+API root endpoint tests for the Pickles FastAPI application.
+
+These tests verify that the root (/) endpoint returns a 200 OK status 
+    and responds with HTML content.
+"""
+# -*- coding: utf-8 -*-
+
 from fastapi.testclient import TestClient
 import sys, os
 

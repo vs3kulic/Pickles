@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""
+API health check test for the Pickles FastAPI application.
+
+This test verifies that the /health endpoint returns a 200 OK status 
+    and the expected JSON response, confirming the API is available.
+"""
+# -*- coding: utf-8 -*-
+
 from fastapi.testclient import TestClient
 import sys, os
 

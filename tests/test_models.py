@@ -3,13 +3,13 @@
 """
 Unit tests for the Product model.
 
+These tests cover object creation, string representations, property access, 
+    and property setters.
+
 - product_id, product_key: mandatory fields
 - product_display_name, product_description: optional fields (default: None)
 - product_is_active: boolean, defaults to False
-
-These tests cover object creation, string representations, property access, and property setters.
 """
-
 import sys
 import os
 

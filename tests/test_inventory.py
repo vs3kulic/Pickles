@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Unit tests for the Inventory model.
+Unit tests for the Inventory class.
 
-- field 1
-- field 2
-- field 3
+These tests verify the interface and behavior of the Inventory model 
+    using MagicMock.
 
-These tests cover object creation, string representations, ...
+The tests cover:
+- add_stock: Ensures add_stock is called with correct arguments.
+- get_stock: Ensures get_stock returns expected values and call counts.
+- reduce_stock: Ensures reduce_stock is called with correct arguments.
+- list_inventory: Ensures list_inventory returns the expected list structure.
+- __repr__: Ensures the string representation is as expected for a MagicMock.
 """
-
 import sys
 import os
 

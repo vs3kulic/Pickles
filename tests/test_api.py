@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+
+"""
+API tests for the inventory management endpoints.
+
+These tests verify the FastAPI inventory API using TestClient and an in-memory 
+    mock repository.
+
+Test coverage includes:
+- /api/inventory/add: Ensures adding stock updates inventory and returns
+    correct status and quantity.
+- /api/inventory/reduce: Ensures reducing stock updates inventory and returns
+    correct status and quantity.
+- /api/inventory/reduce (over-reduce): Ensures reducing more than available
+    stock returns an error and does not update inventory.
+
+All tests use monkeypatching to avoid real Google Sheets API calls and ensure fast, isolated test runs.
+"""
 # tests/test_inventory_api.py
 import os
 import sys
