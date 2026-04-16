@@ -22,7 +22,6 @@ import pytest
 
 # pylint: disable=redefined-outer-name
 
-
 ############
 # FIXTURES #
 ############
@@ -35,7 +34,6 @@ def min_dummy():
 @pytest.fixture
 def max_dummy():
     return Product(3, "spicy_pickles", "Gurke, exotisch", "Single unit of fusion pickles", True)
-
 
 ##############
 # TEST CASES #

@@ -59,7 +59,6 @@ class GoogleSheetsRepository(Repository):
         self._connector = connector
         self._worksheet = connector.get_worksheet(entity)
 
-
     def load(self) -> list[dict]:
         return self._worksheet.get_all_records()
 
