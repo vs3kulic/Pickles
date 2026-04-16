@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from models import Product
 
 # =======================
 # Task 3: Inventory Class

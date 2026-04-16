@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module contains utils for the Pickles application."""
-from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
+from repository import GoogleSheetsConnector, GoogleSheetsRepository
 
 def get_product_repo():
     connector = GoogleSheetsConnector("Pickles DB")
