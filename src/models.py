@@ -56,7 +56,7 @@ class Product:
         return self._product_is_active
 
     @product_is_active.setter
-    def product_is_active(self, value: bool):
+    def product_is_active(self, value: bool) -> None:
         self._product_is_active = value
 
 
@@ -75,7 +75,62 @@ class Product:
 # [ ] (Optional) Abstract base class for shared model methods (e.g., to_dict, from_dict)
 
 class Order:
-    pass
+    
+    def __init__(self, 
+                first_name: str,
+                last_name: str,
+                ordered_product: str,
+                ordered_quantity: int,
+                is_delivery: bool = False
+    ) -> None:
+        self._first_name = first_name
+        self._last_name = last_name
+        self._ordered_product = ordered_product
+        self._ordered_quantity = ordered_quantity
+        self._is_delivery = is_delivery
+
+    def __repr__(self) -> str:
+        return (f"Order(first_name={self._first_name}, "
+                f"last_name={self._last_name}, "
+                f"ordered_product={self._ordered_product}, "
+                f"quantity={self._ordered_quantity}, "
+                f"delivery={self._is_delivery})"
+        )
+
+    def __str__(self) -> str:
+        return (
+            "Product Details: \n"
+            f"{'--'* 14} \n"
+            f"First name:   {self._first_name}\n"
+            f"Last name:    {self._last_name}\n"
+            f"Product:      {self._ordered_product}\n"
+            f"Quantity:     {self._ordered_quantity}\n"
+            f"Delivery:     {self._is_delivery}\n"
+        )
+
+    @property
+    def first_name(self) -> str:
+        return self._first_name
+
+    @property
+    def last_name(self) -> str:
+        return self._last_name
+
+    @property
+    def ordered_product(self) -> str:
+        return self._ordered_product
+
+    @property
+    def ordered_quantity(self) -> int:
+        return self._ordered_quantity
+
+    @property
+    def is_delivery(self) -> bool:
+        return self._is_delivery
+
+    @is_delivery.setter
+    def is_delivery(self, value: bool) -> None:
+        self._is_delivery = value
 
 
 def main():

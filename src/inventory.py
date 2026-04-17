@@ -50,14 +50,6 @@ class Inventory:
         return f"Inventory(quantities={self._quantities})"
 
 
-# =======================
-# Task 4: Order Manager
-# =======================
-
-class OrderManager:
-    pass
-
-
 def main():
     # Start with empty inventory
     inv = Inventory()

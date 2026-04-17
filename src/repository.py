@@ -11,6 +11,7 @@ class Repository(ABC):
     def __init__(self, name: str):
         self._name = name
     
+
     @abstractmethod
     def load(self) -> list[dict]:
         """Return all records."""
@@ -19,6 +20,11 @@ class Repository(ABC):
     @abstractmethod
     def save(self, data: dict) -> None:
         """Persist one record."""
+        raise NotImplementedError("Subclasses must implement this method.")
+
+    @abstractmethod
+    def update_quantity(self, product_id: int, new_quantity: int) -> None:
+        """Update the quantity for a given product_id."""
         raise NotImplementedError("Subclasses must implement this method.")
 
     def __str__(self):
@@ -63,7 +69,7 @@ class GoogleSheetsRepository(Repository):
         return self._worksheet.get_all_records()
 
     def update_quantity(self, product_id: int, new_quantity: int) -> None:
-        """Update the product_quantity for a given product_id."""
+        """Update the quantity for a given product_id."""
         # Find the row with the given product_id
         records = self._worksheet.get_all_records()
         headers = self._worksheet.row_values(1)

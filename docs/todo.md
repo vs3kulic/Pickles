@@ -47,7 +47,7 @@ The point is to keep it fun, simple, and backend-focused.
 - [x] Create one spreadsheet
 - [x] Add `products` sheet
 - [ ] Add `orders` sheet
-- [ ] Add `inventory` sheet
+- [x] Add `inventory` sheet
 - In `products`, store:
   - [x] product_id
   - [x] name
@@ -55,7 +55,6 @@ The point is to keep it fun, simple, and backend-focused.
 - In `inventory`, store:
   - [ ] product_id
   - [ ] stock
-  - [ ] last_updated
 - In `orders`, store:
   - [ ] timestamp
   - [ ] order_id
