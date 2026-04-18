@@ -4,8 +4,9 @@
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from src.utils import apply_quantity_change, get_repo
 from src.models import Product
+from src.inventory import Inventory
+from src.repository import GoogleSheetsRepository as gsr
 import os
 
 #############
@@ -59,7 +60,7 @@ async def add_product(
     product_description: str = Form(...),
     product_is_active: bool = Form(False)
 ) -> dict:
-    repo = get_repo("products")
+    repo = gsr.get_repo("products")
 
     product = Product(
         product_id=product_id,
@@ -79,11 +80,13 @@ async def add_to_stock(
     product_key: str = Form(...),
     quantity: int = Form(...)
 ) -> dict:
-    return apply_quantity_change(
+    inventory, repo = Inventory.from_repo()
+    return inventory.apply_quantity_change(
         product_id,
         product_key,
         quantity,
-        "add"
+        "add",
+        repo=repo
     )
 
 
@@ -92,9 +95,11 @@ async def reduce_stock(
     product_id: int = Form(...),
     quantity: int = Form(...)
 ) -> dict:
-    return apply_quantity_change(
+    inventory, repo = Inventory.from_repo()
+    return inventory.apply_quantity_change(
         product_id,
         None,  # product_key is not needed for reduce
         quantity,
-        "reduce"
+        "reduce",
+        repo=repo
     )

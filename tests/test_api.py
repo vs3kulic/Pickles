@@ -20,7 +20,6 @@ All tests use monkeypatching to avoid real Google Sheets API calls and ensure fa
 import os
 import sys
 import random
-from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -30,8 +29,8 @@ SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
 from src.app import app
-import src.utils as utils
-import src.app as app_module
+
+from src.inventory import Inventory
 
 ############
 # FIXTURES #
@@ -46,38 +45,30 @@ def client():
 def unique_product_id():
     return random.randint(10000, 99999)
 
+# --- Fakes for Inventory and Repo ---
+class FakeRepo:
+    def __init__(self, inventory):
+        self.inventory = inventory
+    def load(self):
+        return [
+            {"product_id": pid, "product_quantity": qty}
+            for pid, qty in self.inventory.items()
+        ]
+    def save(self, row):
+        self.inventory[int(row["product_id"])] = int(row["product_quantity"])
+    def update_quantity(self, product_id, new_quantity):
+        self.inventory[int(product_id)] = int(new_quantity)
+
 
 @pytest.fixture(autouse=True)
 def fake_inventory_repo(monkeypatch):
     inventory = {}
-    mock_repo = MagicMock()
-
-    def mock_load():
-        return [
-            {"product_id": pid, "product_quantity": qty}
-            for pid, qty in inventory.items()
-        ]
-
-    def mock_save(row):
-        inventory[int(row["product_id"])] = int(row["product_quantity"])
-
-    def mock_update_quantity(product_id, new_quantity):
-        inventory[int(product_id)] = int(new_quantity)
-
-    def mock_get_quantities(entity="inventory"):
-        return mock_repo, dict(inventory)
-
-    mock_repo.load.side_effect = mock_load
-    mock_repo.save.side_effect = mock_save
-    mock_repo.update_quantity.side_effect = mock_update_quantity
-
-    monkeypatch.setattr(utils, "get_quantities", mock_get_quantities)
-
-    # If routes imported get_quantities directly, patch there too.
-    if hasattr(app_module, "get_quantities"):
-        monkeypatch.setattr(app_module, "get_quantities", mock_get_quantities)
-
-    yield inventory, mock_repo
+    repo = FakeRepo(inventory)
+    def mock_from_repo(entity="inventory"):
+        inv = Inventory(inventory)
+        return inv, repo
+    monkeypatch.setattr(Inventory, "from_repo", staticmethod(mock_from_repo))
+    yield inventory, repo
 
 
 ##############
@@ -116,12 +107,10 @@ def test_reduce_stock(client, unique_product_id):
 
 def test_reduce_too_much(client, unique_product_id):
     pid = unique_product_id
-
     client.post(
         "/api/inventory/add",
         data={"product_id": pid, "product_key": "test_key", "quantity": 1},
     )
-
     response = client.post(
         "/api/inventory/reduce",
         data={"product_id": pid, "quantity": 5},

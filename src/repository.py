@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the repository layer for the Pickles API."""
-
 from abc import ABC, abstractmethod
 import os
 import gspread
@@ -10,7 +9,9 @@ class Repository(ABC):
 
     def __init__(self, name: str):
         self._name = name
-    
+        
+    def __str__(self):
+        return f"Repository(name={self._name})"
 
     @abstractmethod
     def load(self) -> list[dict]:
@@ -27,9 +28,6 @@ class Repository(ABC):
         """Update the quantity for a given product_id."""
         raise NotImplementedError("Subclasses must implement this method.")
 
-    def __str__(self):
-        return f"Repository(name={self._name})"
-
 
 class GoogleSheetsConnector:
 
@@ -37,6 +35,9 @@ class GoogleSheetsConnector:
         self._document = document
         gclient = self._authenticate()
         self._gdoc = gclient.open(self._document)
+    
+    def __str__(self) -> str:
+        return f"GoogleSheetsConnector(document='{self._document}')"
 
     def _authenticate(self):
         creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -54,9 +55,6 @@ class GoogleSheetsConnector:
                 f"Worksheet {name} not found in {self._document}."
             ) from e
 
-    def __str__(self) -> str:
-        return f"GoogleSheetsConnector(document='{self._document}')"
-
 
 class GoogleSheetsRepository(Repository):
 
@@ -64,6 +62,12 @@ class GoogleSheetsRepository(Repository):
         super().__init__(entity)
         self._connector = connector
         self._worksheet = connector.get_worksheet(entity)
+        
+    def __str__(self) -> str:
+        return ("GoogleSheetsRepository("
+                f"connector='{self._connector}', "
+                f"worksheet='{self._name}')"
+        )
 
     def load(self) -> list[dict]:
         return self._worksheet.get_all_records()
@@ -90,8 +94,8 @@ class GoogleSheetsRepository(Repository):
         row = [data[header] for header in headers]
         self._worksheet.append_row(row)
 
-    def __str__(self) -> str:
-        return ("GoogleSheetsRepository("
-                f"connector='{self._connector}', "
-                f"worksheet='{self._name}')"
-        )
+    @staticmethod
+    def get_repo(entity: str):
+        """Static method to get a GoogleSheetsRepository for a given entity."""
+        connector = GoogleSheetsConnector("Pickles DB")
+        return GoogleSheetsRepository(connector, entity=entity)

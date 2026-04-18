@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from src.repository import GoogleSheetsRepository as gsr
 
 # =======================
 # Task 3: Inventory Class
@@ -29,6 +30,9 @@ class Inventory:
     ):
         self._quantities = quantities if quantities is not None else {}
 
+    def __repr__(self):
+        return f"Inventory(quantities={self._quantities})"
+
     def add_stock(self, product_id: int, amount: int) -> None:
         self._quantities[product_id] = self._quantities.get(product_id, 0) + amount
 
@@ -46,26 +50,60 @@ class Inventory:
         # Returns a list of (product_id, quantity) tuples
         return list(self._quantities.items())
 
-    def __repr__(self):
-        return f"Inventory(quantities={self._quantities})"
+    @classmethod
+    def from_repo(cls, entity: str = "inventory"):
+        """Load inventory quantities from repository and return Inventory instance and repo."""
+        repo = gsr.get_repo(entity=entity)
+        inventory_data = repo.load()
+        quantities = {
+            int(row["product_id"]): int(row["product_quantity"])
+            for row in inventory_data
+        }
+        return cls(quantities), repo
 
+    def apply_quantity_change(
+        self,
+        product_id: int,
+        product_key: str,
+        change: int,
+        action: str,
+        repo=None
+    ) -> dict:
+        """Add or reduce stock and update repo accordingly."""
+        if repo is None:
+            # fallback: load repo if not provided
+            _, repo = self.from_repo()
+        current_quantity = self.get_stock(product_id)
 
-def main():
-    # Start with empty inventory
-    inv = Inventory()
-    print("Initial inventory:", inv.list_inventory())
+        if action == "add":
+            if current_quantity != 0:
+                new_quantity = current_quantity + change
+                repo.update_quantity(product_id, new_quantity)
+                self._quantities[product_id] = new_quantity
+                return {"status": "success", "new_quantity": new_quantity}
+            else:
+                repo.save({
+                    "product_id": product_id,
+                    "product_key": product_key,
+                    "product_quantity": change
+                })
+                self._quantities[product_id] = change
+                return {"status": "success", "new_quantity": change}
 
-    # Add stock for both products
-    inv.add_stock(product_id=1, amount=10)
-    inv.add_stock(2, 5)
-    print("After adding stock:", inv.list_inventory())
+        if action == "reduce":
+            if current_quantity == 0:
+                return {
+                    "status": "error",
+                    "message": f"Product ID {product_id} not found in inventory."
+                }
+            if current_quantity < change:
+                return {
+                    "status": "error",
+                    "message": f"Not enough stock for product {product_id}."
+                }
+            new_quantity = current_quantity - change
+            repo.update_quantity(product_id, new_quantity)
+            self._quantities[product_id] = new_quantity
+            return {"status": "success", "new_quantity": new_quantity}
 
-    # Reduce stock for product 1
-    inv.reduce_stock(1, 3)
-    print("After reducing 3 from product 1:", inv.list_inventory())
-
-    # Get stock for product 2
-    print(f"Stock for product 2: {inv.get_stock(2)}")
-
-if __name__ == "__main__":
-    main()
+        return {"status": "error", "message": "Invalid action."}

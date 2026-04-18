@@ -110,18 +110,3 @@ class Order:
             f"Customer ID:  {self.customer_id}\n"
             f"Delivery:     {self.is_delivery}\n"
         )
-
-
-def main():
-    """Main function to demo the models."""
-    # Product demo
-    p1 = Product("4", "gnarly_pickles", product_is_active=False)
-    print(repr(p1))
-    p1.product_is_active = True
-    print(p1)
-
-    # Order demo
-    pass
-
-if __name__ == "__main__":
-    main()
