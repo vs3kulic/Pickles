@@ -5,6 +5,7 @@ from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from src.utils import apply_quantity_change, get_repo
+from src.models import Product
 import os
 
 #############
@@ -59,13 +60,16 @@ async def add_product(
     product_is_active: bool = Form(False)
 ) -> dict:
     repo = get_repo("products")
-    repo.save({
-            "product_id": product_id,
-            "product_key": product_key,
-            "product_display_name": product_display_name,
-            "product_description": product_description,
-            "product_is_active": product_is_active
-    })
+
+    product = Product(
+        product_id=product_id,
+        product_key=product_key,
+        product_display_name=product_display_name,
+        product_description=product_description,
+        product_is_active=product_is_active
+    )
+
+    repo.save(product.to_dict())
     return {"status": "success"}
 
 
