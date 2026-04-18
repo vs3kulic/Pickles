@@ -34,7 +34,9 @@ class Inventory:
         return f"Inventory(quantities={self._quantities})"
 
     def add_stock(self, product_id: int, amount: int) -> None:
-        self._quantities[product_id] = self._quantities.get(product_id, 0) + amount
+        self._quantities[product_id] = (
+            self._quantities.get(product_id, 0) + amount
+    )
 
     def get_stock(self, product_id: int) -> int:
         return self._quantities.get(product_id, 0)
@@ -50,60 +52,56 @@ class Inventory:
         # Returns a list of (product_id, quantity) tuples
         return list(self._quantities.items())
 
-    @classmethod
-    def from_repo(cls, entity: str = "inventory"):
-        """Load inventory quantities from repository and return Inventory instance and repo."""
-        repo = gsr.get_repo(entity=entity)
-        inventory_data = repo.load()
+
+class InventoryService:
+    """Service layer for inventory operations, decoupling repo from 
+        business logic."""
+    def __init__(self, repo):
+        self.repo = repo
+
+    def load_inventory(self):
+        inventory_data = self.repo.load()
         quantities = {
             int(row["product_id"]): int(row["product_quantity"])
             for row in inventory_data
         }
-        return cls(quantities), repo
+        return Inventory(quantities)
 
-    def apply_quantity_change(
-        self,
-        product_id: int,
-        product_key: str,
-        change: int,
-        action: str,
-        repo=None
-    ) -> dict:
-        """Add or reduce stock and update repo accordingly."""
-        if repo is None:
-            # fallback: load repo if not provided
-            _, repo = self.from_repo()
-        current_quantity = self.get_stock(product_id)
+    def add_stock(self, product_id, product_key, amount):
+        inventory = self.load_inventory()
+        is_new = inventory.get_stock(product_id) == 0
+        inventory.add_stock(product_id, amount)
+        if is_new:
+            self.repo.save({
+                "product_id": product_id,
+                "product_key": product_key,
+                "product_quantity": amount
+            })
+        else:
+            self.repo.update_quantity(
+                product_id, inventory.get_stock(product_id)
+            )
+        return {
+            "status": "success", "new_quantity":
+                inventory.get_stock(product_id)
+        }
 
-        if action == "add":
-            if current_quantity != 0:
-                new_quantity = current_quantity + change
-                repo.update_quantity(product_id, new_quantity)
-                self._quantities[product_id] = new_quantity
-                return {"status": "success", "new_quantity": new_quantity}
-            else:
-                repo.save({
-                    "product_id": product_id,
-                    "product_key": product_key,
-                    "product_quantity": change
-                })
-                self._quantities[product_id] = change
-                return {"status": "success", "new_quantity": change}
-
-        if action == "reduce":
-            if current_quantity == 0:
-                return {
-                    "status": "error",
-                    "message": f"Product ID {product_id} not found in inventory."
-                }
-            if current_quantity < change:
-                return {
-                    "status": "error",
-                    "message": f"Not enough stock for product {product_id}."
-                }
-            new_quantity = current_quantity - change
-            repo.update_quantity(product_id, new_quantity)
-            self._quantities[product_id] = new_quantity
-            return {"status": "success", "new_quantity": new_quantity}
-
-        return {"status": "error", "message": "Invalid action."}
+    def reduce_stock(self, product_id, amount):
+        inventory = self.load_inventory()
+        try:
+            inventory.reduce_stock(product_id, amount)
+        except KeyError:
+            return {
+                "status": "error", "message": 
+                f"Product ID {product_id} not in inventory."
+            }
+        except ValueError:
+            return {
+                "status": "error", "message":
+                f"Not enough stock for product {product_id}."
+            }
+        self.repo.update_quantity(product_id, inventory.get_stock(product_id))
+        return {
+            "status": "success", "new_quantity":
+                inventory.get_stock(product_id)
+        }

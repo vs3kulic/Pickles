@@ -14,7 +14,7 @@ Test coverage includes:
 - /api/inventory/reduce (over-reduce): Ensures reducing more than available
     stock returns an error and does not update inventory.
 
-All tests use monkeypatching to avoid real Google Sheets API calls and ensure fast, isolated test runs.
+All tests use monkeypatching to avoid real Google Sheets API calls.
 """
 # tests/test_inventory_api.py
 import os
@@ -28,9 +28,12 @@ BASE_DIR = os.path.dirname(__file__)
 SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
-from src.app import app
+from src.app import app  # app instance for use with TestClient (test requests)
+import src.app as app_module  # app module itself to patch/override objects
+                              # (like InventoryService) for dependency injection
+                              # in tests
 
-from src.inventory import Inventory
+from src.inventory import InventoryService
 
 ############
 # FIXTURES #
@@ -45,10 +48,9 @@ def client():
 def unique_product_id():
     return random.randint(10000, 99999)
 
-# --- Fakes for Inventory and Repo ---
 class FakeRepo:
-    def __init__(self, inventory):
-        self.inventory = inventory
+    def __init__(self):
+        self.inventory = {}
     def load(self):
         return [
             {"product_id": pid, "product_quantity": qty}
@@ -61,14 +63,19 @@ class FakeRepo:
 
 
 @pytest.fixture(autouse=True)
-def fake_inventory_repo(monkeypatch):
-    inventory = {}
-    repo = FakeRepo(inventory)
-    def mock_from_repo(entity="inventory"):
-        inv = Inventory(inventory)
-        return inv, repo
-    monkeypatch.setattr(Inventory, "from_repo", staticmethod(mock_from_repo))
-    yield inventory, repo
+def override_inventory_repo():
+    """
+    Override the InventoryService repo dependency in FastAPI app for tests.
+    """
+    fake_repo = FakeRepo()
+    def get_fake_inventory_service():
+        return InventoryService(fake_repo)
+
+    # Patch the endpoints to use the fake InventoryService
+    app_module.app.dependency_overrides = {}
+    app_module.InventoryService = lambda repo: get_fake_inventory_service()
+    yield fake_repo
+    app_module.app.dependency_overrides = {}
 
 
 ##############

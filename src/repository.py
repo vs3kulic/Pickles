@@ -35,7 +35,7 @@ class GoogleSheetsConnector:
         self._document = document
         gclient = self._authenticate()
         self._gdoc = gclient.open(self._document)
-    
+
     def __str__(self) -> str:
         return f"GoogleSheetsConnector(document='{self._document}')"
 
