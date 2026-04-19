@@ -4,9 +4,9 @@
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from src.models import Product
+from src.models import Product, OrderService
 from src.inventory import InventoryService
-from src.repository import GoogleSheetsRepository
+from src.repository import GoogleSheetsRepository, GoogleSheetsConnector
 import os
 
 #############
@@ -21,6 +21,7 @@ static_dir = os.path.join(BASE_DIR, '..', 'static')
 index_path = os.path.join(static_dir, "index.html")
 products_path = os.path.join(static_dir, "products.html")
 inventory_path = os.path.join(static_dir, "inventory.html")
+orders_path = os.path.join(static_dir, "orders.html")
 
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
@@ -41,6 +42,11 @@ async def products() -> str:
 @app.get("/inventory", response_class=FileResponse)
 async def inventory() -> str:
     return inventory_path
+
+
+@app.get("/orders", response_class=FileResponse)
+async def orders() -> str:
+    return orders_path
 
 
 #########################
@@ -93,3 +99,15 @@ async def reduce_stock(
     repo = GoogleSheetsRepository.get_repo("inventory")
     service = InventoryService(repo)
     return service.reduce_stock(product_id, quantity)
+
+
+@app.post("/api/orders/add")
+async def add_order(
+    product_id: int = Form(...),
+    quantity: int = Form(...),
+    customer_id: int = Form(...),
+    is_delivery: bool = Form(False)
+) -> dict:
+    repo = GoogleSheetsRepository.get_repo("orders")
+    service = OrderService(repo)
+    return service.place_order(product_id, quantity, customer_id, is_delivery)

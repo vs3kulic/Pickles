@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Admin - Place Order</title>
+	<link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+	<h1>Place New Order</h1>
+	<form id="add-order-form" method="post" action="/api/orders/add">
+		<label>
+			Product ID:
+			<input type="number" name="product_id" required>
+		</label><br>
+		<label>
+			Quantity:
+			<input type="number" name="quantity" required>
+		</label><br>
+		<label>
+			Customer ID:
+			<input type="number" name="customer_id" required>
+		</label><br>
+		<label>
+			Delivery:
+			<input type="checkbox" name="is_delivery">
+		</label><br>
+		<button type="submit">Place Order</button>
+	</form>
+</body>
+</html>

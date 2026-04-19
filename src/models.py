@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 # =====================
 # Task 1: Product Class
@@ -110,3 +110,52 @@ class Order:
             f"Customer ID:  {self.customer_id}\n"
             f"Delivery:     {self.is_delivery}\n"
         )
+
+
+# ====================
+# Task 3: Order Service
+# ====================
+# [ ] Implement an OrderService class with:
+#     - Fields: repository (repository instance)
+#     - Methods: place_order(product_id, quantity, customer_id, is_delivery)
+#     - Methods: list_orders()
+# [ ] __init__ method to set the repository
+# [ ] to_dict() -> dict: returns a dictionary representation
+# [ ] from_dict(data: dict) -> OrderService: classmethod to create an OrderService from a dict
+# [ ] __repr__ or __str__ for debugging
+# [ ] Getters and setters for fields (use @property for status, quantity, etc.)
+# [ ] Static method: validate_status(status: str) -> bool
+# [ ] Class method: generate_order_id() -> str
+# [ ] (Optional) Abstract base class for shared model methods (e.g., to_dict, from_dict)
+
+
+class OrderService:
+    def __init__(self, repo):
+        self.repo = repo
+
+    def place_order(self, product_id, quantity, customer_id, is_delivery):
+        # Generate order_id and timestamp (could be improved)
+        order_id = int(datetime.now(timezone.utc).timestamp() * 1000)
+        order = Order(
+            order_id=order_id,
+            product_id=product_id,
+            quantity=quantity,
+            customer_id=customer_id,
+            timestamp=datetime.now(timezone.utc),
+            is_delivery=is_delivery
+        )
+        self.repo.save(order_to_dict(order))
+        return {"status": "success", "order_id": order_id}
+
+    def list_orders(self):
+        return self.repo.load()
+
+def order_to_dict(order: Order) -> dict:
+    return {
+        "order_id": order.order_id,
+        "product_id": order.product_id,
+        "quantity": order.quantity,
+        "customer_id": order.customer_id,
+        "timestamp": order.timestamp.isoformat(),
+        "is_delivery": order.is_delivery,
+    }
