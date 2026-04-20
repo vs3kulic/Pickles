@@ -5,6 +5,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
 
 # =====================
 # Task 1: Product Class
@@ -137,6 +138,7 @@ class Order:
 
 
 class OrderService:
+
     def __init__(self, repo):
         self.repo = repo
 
@@ -149,10 +151,7 @@ class OrderService:
         vienna_tz = ZoneInfo("Europe/Vienna")
         now = datetime.now(vienna_tz)
 
-        order_id = int(now.timestamp() * 1000)  # returns the number of seconds
-                                                # since the Unix epoch (January
-                                                # 1, 1970, 00:00:00 UTC) as a
-                                                # floating-point number
+        order_id = int(now.timestamp() * 1000)
         order = Order(
             order_id=order_id,
             product_id=product_id,
@@ -161,21 +160,45 @@ class OrderService:
             timestamp=now,
             is_delivery=is_delivery
         )
-        self.repo.save(order_to_dict(order))
+        self.repo.save(OrderService.order_to_dict(order))
         return {"status": "success", "order_id": order_id}
 
     def list_orders(self):
         return self.repo.load()
 
-def order_to_dict(order: Order) -> dict:
-    return {
-        "order_id": order.order_id,
-        "product_id": order.product_id,
-        "quantity": order.quantity,
-        "customer_id": order.customer_id,
-        "timestamp": order.timestamp.isoformat(),
-        "is_delivery": order.is_delivery,
-    }
+    @staticmethod
+    def order_to_dict(order: 'Order') -> dict:
+        return {
+            "order_id": order.order_id,
+            "product_id": order.product_id,
+            "quantity": order.quantity,
+            "customer_id": order.customer_id,
+            "timestamp": order.timestamp.isoformat(),
+            "is_delivery": order.is_delivery,
+        }
+
+    @staticmethod
+    def place_order_for_email(product_id, quantity, customer_name, customer_email, is_delivery):
+        connector = GoogleSheetsConnector("Pickles DB")
+        customers_repo = GoogleSheetsRepository(connector, "customers")
+        orders_repo = GoogleSheetsRepository(connector, "orders")
+
+        # Find or create customer
+        customers = customers_repo.load()
+        customer = None
+        for c in customers:
+            if c.get("customer_email") == customer_email:
+                customer = c
+                break
+        if customer:
+            customer_id = customer["customer_id"]
+        else:
+            result = Customer.register_customer(customer_name, customer_email, customers_repo)
+            customer_id = result["customer_id"]
+
+        # Place order
+        service = OrderService(orders_repo)
+        return service.place_order(product_id, quantity, customer_id, is_delivery)
 
 
 @dataclass(frozen=True)
