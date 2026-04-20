@@ -110,7 +110,11 @@ async def add_order(
     customer_email: str = Form(...),
     is_delivery: bool = Form(False)
 ) -> dict:
-    return OrderService.place_order_for_email(
+    connector = GoogleSheetsConnector("Pickles DB")
+    customers_repo = GoogleSheetsRepository(connector, "customers")
+    orders_repo = GoogleSheetsRepository(connector, "orders")
+    service = OrderService(orders_repo, customers_repo)
+    return service.place_order_for_email(
         product_id=product_id,
         quantity=quantity,
         customer_name=customer_name,

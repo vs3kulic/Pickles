@@ -138,19 +138,19 @@ class Order:
 
 
 class OrderService:
+    def __init__(self, orders_repo, customers_repo):
+        self.orders_repo = orders_repo
+        self.customers_repo = customers_repo
 
-    def __init__(self, repo):
-        self.repo = repo
-
-    def place_order(self,
-                    product_id,
-                    quantity,
-                    customer_id,
-                    is_delivery
+    def place_order(
+        self,
+        product_id,
+        quantity,
+        customer_id,
+        is_delivery
     ) -> dict:
         vienna_tz = ZoneInfo("Europe/Vienna")
         now = datetime.now(vienna_tz)
-
         order_id = int(now.timestamp() * 1000)
         order = Order(
             order_id=order_id,
@@ -160,11 +160,11 @@ class OrderService:
             timestamp=now,
             is_delivery=is_delivery
         )
-        self.repo.save(OrderService.order_to_dict(order))
+        self.orders_repo.save(OrderService.order_to_dict(order))
         return {"status": "success", "order_id": order_id}
 
     def list_orders(self):
-        return self.repo.load()
+        return self.orders_repo.load()
 
     @staticmethod
     def order_to_dict(order: 'Order') -> dict:
@@ -177,28 +177,32 @@ class OrderService:
             "is_delivery": order.is_delivery,
         }
 
-    @staticmethod
-    def place_order_for_email(product_id, quantity, customer_name, customer_email, is_delivery):
-        connector = GoogleSheetsConnector("Pickles DB")
-        customers_repo = GoogleSheetsRepository(connector, "customers")
-        orders_repo = GoogleSheetsRepository(connector, "orders")
-
-        # Find or create customer
-        customers = customers_repo.load()
-        customer = None
+    def find_or_register_customer(self, name, email):
+        customers = self.customers_repo.load()
         for c in customers:
-            if c.get("customer_email") == customer_email:
-                customer = c
-                break
-        if customer:
-            customer_id = customer["customer_id"]
-        else:
-            result = Customer.register_customer(customer_name, customer_email, customers_repo)
-            customer_id = result["customer_id"]
+            if c.get("customer_email") == email:
+                return Customer(
+                    customer_id=c["customer_id"],
+                    customer_name=c["customer_name"],
+                    customer_email=c["customer_email"]
+                )
+        return Customer.register_customer(name, email, self.customers_repo)
 
-        # Place order
-        service = OrderService(orders_repo)
-        return service.place_order(product_id, quantity, customer_id, is_delivery)
+    def place_order_for_email(
+        self,
+        product_id,
+        quantity,
+        customer_name,
+        customer_email,
+        is_delivery
+    ) -> dict:
+        customer = self.find_or_register_customer(customer_name, customer_email)
+        return self.place_order(
+            product_id,
+            quantity,
+            customer.customer_id,
+            is_delivery
+        )
 
 
 @dataclass(frozen=True)
@@ -208,15 +212,16 @@ class Customer:
     customer_email: str
 
     @staticmethod
-    def register_customer(name, email, repo):
-        customer_id = uuid.uuid4().hex
+    def register_customer(name, email, repo) -> "Customer":
+        customer_id = f"customer_{uuid.uuid4().hex[:8]}"
         now = datetime.now(ZoneInfo("Europe/Vienna"))
-        repo.save({
-            "customer_id": customer_id,
-            "customer_name": name,
-            "customer_email": email
-        })
-        return {"status": "success", "customer_id": customer_id}
+        customer = Customer(
+            customer_id=customer_id,
+            customer_name=name,
+            customer_email=email
+        )
+        repo.save(customer.to_dict())
+        return customer
 
     def to_dict(self):
         return {
