@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # =====================
 # Task 1: Product Class
@@ -9,7 +10,6 @@ from datetime import datetime, timezone
 # [ ] Static method: validate_product_data(data: dict) -> bool
 
 class Product:
-    
     def __init__(self,
                 product_id: int,
                 product_key: str,
@@ -96,8 +96,11 @@ class Order:
     is_delivery: bool
 
     def __repr__(self) -> str:
-        return (f"Order(order_id={self.order_id}, product_id={self.product_id}, "
-                f"quantity={self.quantity}, customer_id={self.customer_id}, "
+        return (f"Order(order_id={self.order_id}, "
+                f"product_id={self.product_id}, "
+                f"quantity={self.quantity}, "
+                f"customer_id={self.customer_id}, "
+                f"timestamp={self.timestamp}"
                 f"is_delivery={self.is_delivery})")
 
     def __str__(self) -> str:
@@ -108,6 +111,7 @@ class Order:
             f"Product ID:   {self.product_id}\n"
             f"Quantity:     {self.quantity}\n"
             f"Customer ID:  {self.customer_id}\n"
+            f"Timestamp:    {self.timestamp}\n"
             f"Delivery:     {self.is_delivery}\n"
         )
 
@@ -133,15 +137,25 @@ class OrderService:
     def __init__(self, repo):
         self.repo = repo
 
-    def place_order(self, product_id, quantity, customer_id, is_delivery):
-        # Generate order_id and timestamp (could be improved)
-        order_id = int(datetime.now(timezone.utc).timestamp() * 1000)
+    def place_order(self,
+                    product_id,
+                    quantity,
+                    customer_id,
+                    is_delivery
+    ) -> dict:
+        vienna_tz = ZoneInfo("Europe/Vienna")
+        now = datetime.now(vienna_tz)
+
+        order_id = int(now.timestamp() * 1000)  # returns the number of seconds
+                                                # since the Unix epoch (January
+                                                # 1, 1970, 00:00:00 UTC) as a
+                                                # floating-point number
         order = Order(
             order_id=order_id,
             product_id=product_id,
             quantity=quantity,
             customer_id=customer_id,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=now,
             is_delivery=is_delivery
         )
         self.repo.save(order_to_dict(order))
