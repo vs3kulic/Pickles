@@ -1,12 +1,11 @@
-from src.models import Customer
 # -*- coding: utf-8 -*-
-"""This module contains the setup for the Pickles application."""
+"""This module contains the setup and endpoints for the Pickles application."""
 
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from src.models import Product, OrderService
-from src.inventory import InventoryService
+from src.models import Product
+from src.services import InventoryService, OrderService
 from src.repository import GoogleSheetsRepository, GoogleSheetsConnector
 import os
 

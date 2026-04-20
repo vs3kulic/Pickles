@@ -58,8 +58,15 @@
             <label for="customer_email" class="mb-2 block text-sm font-medium text-stone-700">Kontakt</label>
             <input type="text" id="customer_email" name="customer_email" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
           </div>
+          <div>
+                      <label for="is_delivery" class="mb-2 block text-sm font-medium text-stone-700">Lieferung oder Abholung?</label>
+                      <select id="is_delivery" name="is_delivery" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100">
+                        <option value="False">Abholung</option>
+                        <option value="True">Lieferung</option>
+                      </select>
+          </div>
           <button type="submit" class="w-full rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
-            Glas abschicken
+            Her mit den Gurken!
           </button>
         </form>
         <!-- Success/error messages will be handled by the backend and shown as a new page -->

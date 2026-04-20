@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""This module contains the repository layer for the Pickles API."""
+"""This module contains the repository layer for the Pickles application."""
+
 from abc import ABC, abstractmethod
 import os
 import gspread
@@ -9,7 +10,7 @@ class Repository(ABC):
 
     def __init__(self, name: str):
         self._name = name
-        
+
     def __str__(self):
         return f"Repository(name={self._name})"
 

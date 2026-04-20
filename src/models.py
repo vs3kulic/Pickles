@@ -1,17 +1,11 @@
-import uuid
-
-
 # -*- coding: utf-8 -*-
+"""This module contains the domain models for the Pickles application."""
+
 from dataclasses import dataclass
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from src.repository import GoogleSheetsConnector, GoogleSheetsRepository
+import uuid
 
-# =====================
-# Task 1: Product Class
-# =====================
-# [ ] Class method: from_dict(data: dict) -> Product (handle active: 1/0 -> bool conversion)
-# [ ] Static method: validate_product_data(data: dict) -> bool
 
 class Product:
     def __init__(self,
@@ -75,21 +69,6 @@ class Product:
         self._product_is_active = value
 
 
-# ====================
-# Task 2: Order Class
-# ====================
-# [ ] Implement an Order class with:
-#     - Fields: order_id (str), customer_name (str), contact (str), product_id (str), quantity (int), timestamp (datetime), status (str)
-# [ ] __init__ method to set all fields
-# [ ] to_dict() -> dict: returns a dictionary representation
-# [ ] from_dict(data: dict) -> Order: classmethod to create an Order from a dict
-# [ ] __repr__ or __str__ for debugging
-# [ ] Getters and setters for fields (use @property for status, quantity, etc.)
-# [ ] Static method: validate_status(status: str) -> bool
-# [ ] Class method: generate_order_id() -> str
-# [ ] (Optional) Abstract base class for shared model methods (e.g., to_dict, from_dict)
-
-
 @dataclass(frozen=True)
 class Order:
     order_id: int
@@ -120,89 +99,35 @@ class Order:
         )
 
 
-# ====================
-# Task 3: Order Service
-# ====================
-# [ ] Implement an OrderService class with:
-#     - Fields: repository (repository instance)
-#     - Methods: place_order(product_id, quantity, customer_id, is_delivery)
-#     - Methods: list_orders()
-# [ ] __init__ method to set the repository
-# [ ] to_dict() -> dict: returns a dictionary representation
-# [ ] from_dict(data: dict) -> OrderService: classmethod to create an OrderService from a dict
-# [ ] __repr__ or __str__ for debugging
-# [ ] Getters and setters for fields (use @property for status, quantity, etc.)
-# [ ] Static method: validate_status(status: str) -> bool
-# [ ] Class method: generate_order_id() -> str
-# [ ] (Optional) Abstract base class for shared model methods (e.g., to_dict, from_dict)
+class Inventory:
 
-
-class OrderService:
-    def __init__(self, orders_repo, customers_repo):
-        self.orders_repo = orders_repo
-        self.customers_repo = customers_repo
-
-    def place_order(
+    def __init__(
         self,
-        product_id,
-        quantity,
-        customer_id,
-        is_delivery
-    ) -> dict:
-        vienna_tz = ZoneInfo("Europe/Vienna")
-        now = datetime.now(vienna_tz)
-        order_id = int(now.timestamp() * 1000)
-        order = Order(
-            order_id=order_id,
-            product_id=product_id,
-            quantity=quantity,
-            customer_id=customer_id,
-            timestamp=now,
-            is_delivery=is_delivery
-        )
-        self.orders_repo.save(OrderService.order_to_dict(order))
-        return {"status": "success", "order_id": order_id}
+        quantities: dict | None = None,
+    ):
+        self._quantities = quantities if quantities is not None else {}
 
-    def list_orders(self):
-        return self.orders_repo.load()
+    def __repr__(self):
+        return f"Inventory(quantities={self._quantities})"
 
-    @staticmethod
-    def order_to_dict(order: 'Order') -> dict:
-        return {
-            "order_id": order.order_id,
-            "product_id": order.product_id,
-            "quantity": order.quantity,
-            "customer_id": order.customer_id,
-            "timestamp": order.timestamp.isoformat(),
-            "is_delivery": order.is_delivery,
-        }
+    def add_stock(self, product_id: int, amount: int) -> None:
+        self._quantities[product_id] = (
+            self._quantities.get(product_id, 0) + amount
+    )
 
-    def find_or_register_customer(self, name, email):
-        customers = self.customers_repo.load()
-        for c in customers:
-            if c.get("customer_email") == email:
-                return Customer(
-                    customer_id=c["customer_id"],
-                    customer_name=c["customer_name"],
-                    customer_email=c["customer_email"]
-                )
-        return Customer.register_customer(name, email, self.customers_repo)
+    def get_stock(self, product_id: int) -> int:
+        return self._quantities.get(product_id, 0)
 
-    def place_order_for_email(
-        self,
-        product_id,
-        quantity,
-        customer_name,
-        customer_email,
-        is_delivery
-    ) -> dict:
-        customer = self.find_or_register_customer(customer_name, customer_email)
-        return self.place_order(
-            product_id,
-            quantity,
-            customer.customer_id,
-            is_delivery
-        )
+    def reduce_stock(self, product_id: int, amount: int = 1) -> None:
+        if product_id not in self._quantities:
+            raise KeyError(f"Product {product_id} not found in inventory.")
+        if self._quantities[product_id] < amount:
+            raise ValueError(f"Not enough stock for product {product_id}.")
+        self._quantities[product_id] -= amount
+
+    def list_inventory(self):
+        # Returns a list of (product_id, quantity) tuples
+        return list(self._quantities.items())
 
 
 @dataclass(frozen=True)
@@ -212,8 +137,8 @@ class Customer:
     customer_email: str
 
     @staticmethod
-    def register_customer(name, email, repo) -> "Customer":
-        customer_id = f"customer_{uuid.uuid4().hex[:8]}"
+    def register_customer(name, email, repo):
+        customer_id = "customer_" + uuid.uuid4().hex[:8]
         now = datetime.now(ZoneInfo("Europe/Vienna"))
         customer = Customer(
             customer_id=customer_id,
