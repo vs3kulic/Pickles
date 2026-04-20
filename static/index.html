@@ -38,12 +38,12 @@
       </div>
 
       <div class="p-8 md:p-12">
-        <form id="orderForm" class="space-y-5">
+        <form id="orderForm" class="space-y-5" method="post" action="/api/orders/add">
           <div>
-            <label for="product" class="mb-2 block text-sm font-medium text-stone-700">Produkt</label>
-            <select id="product" name="product" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100">
-              <option value="spicy">Gurke, würzig</option>
-              <option value="classic">Gurke, klassisch</option>
+            <label for="product_id" class="mb-2 block text-sm font-medium text-stone-700">Produkt</label>
+            <select id="product_id" name="product_id" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100">
+              <option value="1">Gurke, würzig</option>
+              <option value="2">Gurke, klassisch</option>
             </select>
           </div>
           <div>
@@ -51,52 +51,21 @@
             <input type="number" id="quantity" name="quantity" min="1" value="1" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
           </div>
           <div>
-            <label for="name" class="mb-2 block text-sm font-medium text-stone-700">Dein Name</label>
-            <input type="text" id="name" name="name" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
+            <label for="customer_name" class="mb-2 block text-sm font-medium text-stone-700">Dein Name</label>
+            <input type="text" id="customer_name" name="customer_name" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
           </div>
           <div>
-            <label for="contact" class="mb-2 block text-sm font-medium text-stone-700">Kontakt</label>
-            <input type="text" id="contact" name="contact" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
+            <label for="customer_email" class="mb-2 block text-sm font-medium text-stone-700">Kontakt</label>
+            <input type="text" id="customer_email" name="customer_email" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
           </div>
           <button type="submit" class="w-full rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
             Glas abschicken
           </button>
         </form>
-        <div class="mt-4 text-center text-sm" id="msg"></div>
+        <!-- Success/error messages will be handled by the backend and shown as a new page -->
       </div>
     </section>
   </main>
-    <script>
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const msg = document.getElementById('msg');
-            msg.textContent = '';
-            const data = {
-                product: document.getElementById('product').value,
-                quantity: document.getElementById('quantity').value,
-                name: document.getElementById('name').value,
-                contact: document.getElementById('contact').value
-            };
-            try {
-                const res = await fetch('/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (res.ok) {
-                    msg.textContent = 'Bestellung abgeschickt!';
-                    msg.style.color = '#38a169';
-                    document.getElementById('orderForm').reset();
-                } else {
-                    const err = await res.json();
-                    msg.textContent = err.detail || 'Fehler beim Abschicken.';
-                    msg.style.color = '#e53e3e';
-                }
-            } catch {
-                msg.textContent = 'Netzwerkfehler.';
-                msg.style.color = '#e53e3e';
-            }
-        });
-    </script>
+    <!-- No JavaScript needed for plain HTML form submission -->
 </body>
 </html>

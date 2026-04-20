@@ -1,3 +1,4 @@
+from src.models import Customer
 # -*- coding: utf-8 -*-
 """This module contains the setup for the Pickles application."""
 
@@ -101,13 +102,34 @@ async def reduce_stock(
     return service.reduce_stock(product_id, quantity)
 
 
+
+# Combined endpoint: create customer if needed, then create order
 @app.post("/api/orders/add")
 async def add_order(
     product_id: int = Form(...),
     quantity: int = Form(...),
-    customer_id: int = Form(...),
+    customer_name: str = Form(...),
+    customer_email: str = Form(...),
     is_delivery: bool = Form(False)
 ) -> dict:
-    repo = GoogleSheetsRepository.get_repo("orders")
-    service = OrderService(repo)
+    connector = GoogleSheetsConnector("Pickles DB")
+    customers_repo = GoogleSheetsRepository(connector, "customers")
+    orders_repo = GoogleSheetsRepository(connector, "orders")
+
+    # Check if customer exists by email
+    customers = customers_repo.load()
+    customer = None
+    for c in customers:
+        if c.get("customer_email") == customer_email:
+            customer = c
+            break
+    if customer:
+        customer_id = customer["customer_id"]
+    else:
+        # Register new customer
+        result = Customer.register_customer(customer_name, customer_email, customers_repo)
+        customer_id = result["customer_id"]
+
+    # Place order
+    service = OrderService(orders_repo)
     return service.place_order(product_id, quantity, customer_id, is_delivery)

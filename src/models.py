@@ -1,3 +1,6 @@
+import uuid
+
+
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
 from datetime import datetime
@@ -173,3 +176,28 @@ def order_to_dict(order: Order) -> dict:
         "timestamp": order.timestamp.isoformat(),
         "is_delivery": order.is_delivery,
     }
+
+
+@dataclass(frozen=True)
+class Customer:
+    customer_id: str
+    customer_name: str
+    customer_email: str
+
+    @staticmethod
+    def register_customer(name, email, repo):
+        customer_id = uuid.uuid4().hex
+        now = datetime.now(ZoneInfo("Europe/Vienna"))
+        repo.save({
+            "customer_id": customer_id,
+            "customer_name": name,
+            "customer_email": email
+        })
+        return {"status": "success", "customer_id": customer_id}
+
+    def to_dict(self):
+        return {
+            "customer_id": self.customer_id,
+            "customer_name": self.customer_name,
+            "customer_email": self.customer_email,
+        }
