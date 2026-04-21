@@ -360,4 +360,3 @@ Endpoints instantiate the connector, build the needed `GoogleSheetsRepository` i
 - **Immutable vs mutable models.** `Order` and `Customer` are frozen dataclasses; `Product` and `Inventory` are mutable because their state legitimately changes over time.
 ````
 
-Quellen

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module contains the setup and endpoints for the Pickles application."""
 
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from src.models import Product
@@ -80,24 +80,31 @@ async def add_product(
     return {"status": "success"}
 
 
+
+def get_inventory_service():
+    repo = GoogleSheetsRepository.get_repo("inventory")
+    return InventoryService(repo)
+
 @app.post("/api/inventory/add")
 async def add_to_stock(
     product_id: int = Form(...),
     product_key: str = Form(...),
-    quantity: int = Form(...)
+    quantity: int = Form(...),
+    service: InventoryService = Depends(get_inventory_service)
 ) -> dict:
-    repo = GoogleSheetsRepository.get_repo("inventory")
-    service = InventoryService(repo)
-    return service.add_stock(product_id, product_key, quantity)
+    endpoint_start = time.time()
+    result = service.add_stock(product_id, product_key, quantity)
+    print(f"[TIMER] add_to_stock endpoint total: {time.time() - endpoint_start:.4f} seconds")
+    return result
+
 
 
 @app.post("/api/inventory/reduce")
 async def reduce_stock(
     product_id: int = Form(...),
-    quantity: int = Form(...)
+    quantity: int = Form(...),
+    service: InventoryService = Depends(get_inventory_service)
 ) -> dict:
-    repo = GoogleSheetsRepository.get_repo("inventory")
-    service = InventoryService(repo)
     return service.reduce_stock(product_id, quantity)
 
 

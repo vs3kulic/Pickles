@@ -20,6 +20,7 @@ All tests use monkeypatching to avoid real Google Sheets API calls.
 import os
 import sys
 import random
+import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,11 +30,12 @@ SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "src"))
 sys.path.insert(0, SRC_DIR)
 
 from src.app import app  # app instance for use with TestClient (test requests)
-import src.app as app_module  # app module itself to patch/override objects
+import src.app as app_module  # app_module to patch/override objects
                               # (like InventoryService) for dependency injection
                               # in tests
 
-from src.inventory import InventoryService
+from services import InventoryService
+from src.repository import GoogleSheetsRepository
 
 ############
 # FIXTURES #
@@ -41,7 +43,10 @@ from src.inventory import InventoryService
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    start = time.time()
+    c = TestClient(app)
+    print(f"[TIMER] TestClient(app) creation took {time.time() - start:.4f} seconds")
+    return c
 
 
 @pytest.fixture
@@ -51,42 +56,44 @@ def unique_product_id():
 class FakeRepo:
     def __init__(self):
         self.inventory = {}
+
     def load(self):
         return [
             {"product_id": pid, "product_quantity": qty}
             for pid, qty in self.inventory.items()
         ]
+
     def save(self, row):
         self.inventory[int(row["product_id"])] = int(row["product_quantity"])
+
     def update_quantity(self, product_id, new_quantity):
         self.inventory[int(product_id)] = int(new_quantity)
 
 
 @pytest.fixture(autouse=True)
-def override_inventory_repo():
+def patch_inventory_repo(monkeypatch):
     """
-    Override the InventoryService repo dependency in FastAPI app for tests.
+    Patch GoogleSheetsRepository.get_repo to return a FakeRepo-based InventoryService.
     """
     fake_repo = FakeRepo()
-    def get_fake_inventory_service():
-        return InventoryService(fake_repo)
 
-    # Patch the endpoints to use the fake InventoryService
-    app_module.app.dependency_overrides = {}
-    app_module.InventoryService = lambda repo: get_fake_inventory_service()
+    def fake_get_repo(entity):
+        return fake_repo
+
+    monkeypatch.setattr(GoogleSheetsRepository, "get_repo", fake_get_repo)
     yield fake_repo
-    app_module.app.dependency_overrides = {}
-
 
 ##############
 # TEST CASES #
 ##############
 
 def test_add_to_stock(client):
+    start = time.time()
     response = client.post(
         "/api/inventory/add",
         data={"product_id": 101, "product_key": "test_key", "quantity": 5},
     )
+    print(f"[TIMER] POST /api/inventory/add took {time.time() - start:.4f} seconds")
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "success"

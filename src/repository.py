@@ -99,4 +99,5 @@ class GoogleSheetsRepository(Repository):
     def get_repo(entity: str):
         """Static method to get a GoogleSheetsRepository for a given entity."""
         connector = GoogleSheetsConnector("Pickles DB")
-        return GoogleSheetsRepository(connector, entity=entity)
+        repo = GoogleSheetsRepository(connector, entity=entity)
+        return repo
