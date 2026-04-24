@@ -1,78 +1,200 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gurken bestellen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pfalzauer Prime Pickles – Hofladen Bestellung</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-lime-50 text-stone-900">
-  <main class="min-h-screen flex items-center justify-center p-6">
-    <section class="grid w-full max-w-5xl overflow-hidden rounded-3xl border border-lime-200 bg-white shadow-[0_20px_80px_rgba(0,0,0,0.08)] md:grid-cols-2">
-
-      <div class="bg-gradient-to-br from-lime-200 via-lime-100 to-emerald-50 p-8 md:p-12">
-        <span class="inline-flex rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-lime-100">
+<body class="min-h-screen bg-stone-100 text-stone-900">
+  <header class="border-b border-stone-300 bg-stone-50">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-800">
           Pfalzauer Prime Pickles
-        </span>
-        <h1 class="mt-6 text-4xl font-black tracking-tight text-stone-900 md:text-5xl">
-          Gurken bestellen
-          <span class="block text-emerald-700">mit Geschmack.</span>
-        </h1>
-        <p class="mt-4 max-w-md text-base leading-7 text-stone-700">
-          Würzig. Knackig. Zum Finger lecken. Wähl' dein Glas und lass' dir schmecken!
         </p>
-        <div class="mt-8 space-y-3 text-sm text-stone-700">
-          <div class="flex items-center gap-3">
-            <span class="h-2.5 w-2.5 rounded-full bg-emerald-600"></span>
-            1 Glas = 500ml Geschmack
+        <p class="mt-1 text-sm text-stone-600">
+          Hofladen · Kleine Chargen · Eingelegt mit Haltung
+        </p>
+      </div>
+      <div class="hidden text-sm text-stone-600 md:block">
+        Bestellung für Abholung oder Lieferung
+      </div>
+    </div>
+  </header>
+
+  <main class="px-6 py-8 md:py-12">
+    <section class="mx-auto grid max-w-6xl overflow-hidden rounded-[2rem] border border-stone-300 bg-stone-50 shadow-[0_20px_60px_rgba(60,40,20,0.10)] md:grid-cols-[1.05fr_0.95fr]">
+      <div class="relative overflow-hidden bg-[linear-gradient(180deg,rgba(214,211,174,0.9),rgba(245,241,232,1))] p-8 md:p-12">
+        <div class="max-w-xl">
+          <span class="inline-flex rounded-full border border-stone-700 bg-stone-900 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-stone-100">
+            Aus der Gurkenkammer
+          </span>
+
+          <h1 class="mt-6 text-4xl font-black leading-tight tracking-tight text-stone-900 md:text-6xl">
+            Gurken bestellen
+            <span class="block text-emerald-800">wie im Hofladen.</span>
+          </h1>
+
+          <p class="mt-5 max-w-lg text-base leading-8 text-stone-700 md:text-lg">
+            Knackig eingelegt, würzig abgeschmeckt und in kleinen Chargen abgefüllt.
+            Such dir dein Glas aus, trag dich ein, und wir machen den Rest bereit.
+          </p>
+
+          <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <article class="rounded-3xl border border-stone-300 bg-stone-50/80 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                Was drinsteckt
+              </p>
+              <p class="mt-2 text-base font-semibold text-stone-900">
+                Regionale Zutaten, ehrlicher Sud, kein Schnickschnack.
+              </p>
+            </article>
+
+            <article class="rounded-3xl border border-stone-300 bg-stone-50/80 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                Wie wir arbeiten
+              </p>
+              <p class="mt-2 text-base font-semibold text-stone-900">
+                Kleine Chargen, sauber geführt, direkt aus unserer Bestellung.
+              </p>
+            </article>
           </div>
-          <div class="flex items-center gap-3">
-            <span class="h-2.5 w-2.5 rounded-full bg-emerald-600"></span>
-            Kleine Chargen, großes Umami!
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="h-2.5 w-2.5 rounded-full bg-emerald-600"></span>
-            Mit leckeren, regionalen Zutaten.
+
+          <div class="mt-10 rounded-[1.5rem] border border-stone-300 bg-stone-900 px-5 py-5 text-stone-100">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-lime-200">
+              Diese Woche im Regal
+            </p>
+            <ul class="mt-4 space-y-3 text-sm leading-7 text-stone-200">
+              <li>• 500ml pro Glas</li>
+              <li>• Würzig oder klassisch</li>
+              <li>• Abholung oder Lieferung auswählbar</li>
+            </ul>
           </div>
         </div>
       </div>
 
-      <div class="p-8 md:p-12">
-        <form id="orderForm" class="space-y-5" method="post" action="/api/orders/add">
-          <div>
-            <label for="product_id" class="mb-2 block text-sm font-medium text-stone-700">Produkt</label>
-            <select id="product_id" name="product_id" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100">
-              <option value="1">Gurke, würzig</option>
-              <option value="2">Gurke, klassisch</option>
-            </select>
-          </div>
-          <div>
-            <label for="quantity" class="mb-2 block text-sm font-medium text-stone-700">Menge</label>
-            <input type="number" id="quantity" name="quantity" min="1" value="1" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-          </div>
-          <div>
-            <label for="customer_name" class="mb-2 block text-sm font-medium text-stone-700">Dein Name</label>
-            <input type="text" id="customer_name" name="customer_name" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-          </div>
-          <div>
-            <label for="customer_email" class="mb-2 block text-sm font-medium text-stone-700">Kontakt</label>
-            <input type="text" id="customer_email" name="customer_email" required class="w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-          </div>
-          <div>
-                      <label for="is_delivery" class="mb-2 block text-sm font-medium text-stone-700">Lieferung oder Abholung?</label>
-                      <select id="is_delivery" name="is_delivery" class="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100">
-                        <option value="False">Abholung</option>
-                        <option value="True">Lieferung</option>
-                      </select>
-          </div>
-          <button type="submit" class="w-full rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
-            Her mit den Gurken!
-          </button>
-        </form>
-        <!-- Success/error messages will be handled by the backend and shown as a new page -->
+      <div class="bg-[#f7f2e8] p-8 md:p-12">
+        <div class="max-w-xl">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
+            Bestellzettel
+          </p>
+          <h2 class="mt-3 text-3xl font-black tracking-tight text-stone-900">
+            Dein Glas wartet schon.
+          </h2>
+          <p class="mt-3 text-sm leading-7 text-stone-600">
+            Füll den Zettel aus und schick uns deine Bestellung direkt durch.
+          </p>
+
+          <form
+            id="orderForm"
+            class="mt-8 space-y-7"
+            method="post"
+            action="/api/orders/add"
+          >
+            <fieldset class="space-y-5">
+              <legend class="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-stone-500">
+                Auswahl
+              </legend>
+
+              <div>
+                <label for="product_id" class="mb-2 block text-sm font-medium text-stone-700">
+                  Produkt
+                </label>
+                <select
+                  id="product_id"
+                  name="product_id"
+                  class="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 text-stone-900 outline-none transition focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100"
+                >
+                  <option value="1">Gurke, würzig</option>
+                  <option value="2">Gurke, klassisch</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="quantity" class="mb-2 block text-sm font-medium text-stone-700">
+                  Menge
+                </label>
+                <input
+                  type="number"
+                  id="quantity"
+                  name="quantity"
+                  min="1"
+                  value="1"
+                  required
+                  class="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 text-stone-900 outline-none focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+            </fieldset>
+
+            <fieldset class="space-y-5">
+              <legend class="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-stone-500">
+                Deine Angaben
+              </legend>
+
+              <div>
+                <label for="customer_name" class="mb-2 block text-sm font-medium text-stone-700">
+                  Dein Name
+                </label>
+                <input
+                  type="text"
+                  id="customer_name"
+                  name="customer_name"
+                  required
+                  class="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 text-stone-900 outline-none focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+
+              <div>
+                <label for="customer_email" class="mb-2 block text-sm font-medium text-stone-700">
+                  E-Mail oder Kontakt
+                </label>
+                <input
+                  type="email"
+                  id="customer_email"
+                  name="customer_email"
+                  required
+                  class="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 text-stone-900 outline-none focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+            </fieldset>
+
+            <fieldset class="space-y-5">
+              <legend class="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-stone-500">
+                Ausgabe
+              </legend>
+
+              <div>
+                <label for="is_delivery" class="mb-2 block text-sm font-medium text-stone-700">
+                  Lieferung oder Abholung?
+                </label>
+                <select
+                  id="is_delivery"
+                  name="is_delivery"
+                  class="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 text-stone-900 outline-none transition focus:border-emerald-700 focus:ring-4 focus:ring-emerald-100"
+                >
+                  <option value="False">Abholung</option>
+                  <option value="True">Lieferung</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="w-full rounded-2xl bg-emerald-700 px-5 py-4 text-sm font-bold uppercase tracking-[0.14em] text-stone-50 transition hover:bg-emerald-800"
+              >
+                Bestellung absenden
+              </button>
+              <p class="mt-3 text-sm leading-6 text-stone-600">
+                Wir nutzen deine Angaben nur, um die Bestellung zuzuordnen und dein Glas für
+                Lieferung oder Abholung vorzubereiten.
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
   </main>
-    <!-- No JavaScript needed for plain HTML form submission -->
 </body>
 </html>

@@ -92,9 +92,7 @@ async def add_to_stock(
     quantity: int = Form(...),
     service: InventoryService = Depends(get_inventory_service)
 ) -> dict:
-    endpoint_start = time.time()
     result = service.add_stock(product_id, product_key, quantity)
-    print(f"[TIMER] add_to_stock endpoint total: {time.time() - endpoint_start:.4f} seconds")
     return result
 
 
