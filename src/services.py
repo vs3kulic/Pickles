@@ -4,7 +4,36 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Any, List, Dict
-from src.models import Order, Inventory, Customer
+from src.models import Product, Order, Inventory, Customer
+
+
+class ProductService:
+    """Service for handling product-related operations."""
+
+    def __init__(self, repo: Any) -> None:
+        self.repo = repo
+
+    def add_product(
+        self,
+        product_id: int,
+        product_key: str,
+        product_display_name: str | None,
+        product_description: str | None,
+        product_is_active: bool = False
+    ) -> dict:
+        product = Product(
+            product_id=product_id,
+            product_key=product_key,
+            product_display_name=product_display_name,
+            product_description=product_description,
+            product_is_active=product_is_active
+        )
+        self.repo.save(product.to_dict())
+        return {"status": "success"}
+
+    def list_products(self) -> list[dict]:
+        return self.repo.load()
+
 
 class OrderService:
     """Service for handling order-related operations."""

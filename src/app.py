@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """This module contains the setup and endpoints for the Pickles application."""
 
+import os
 from fastapi import FastAPI, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
-from src.models import Product
-from src.services import InventoryService, OrderService
-from src.repository import GoogleSheetsRepository, GoogleSheetsConnector
-import os
+from src.utils import build_product_service, build_inventory_service, build_order_service
 
 #############
 # APP SETUP #
@@ -58,7 +56,6 @@ async def orders() -> str:
 async def health() -> dict:
     return {"status": "ok", "message": "The Pickles API is available."}
 
-
 #
 # Products
 #
@@ -71,27 +68,18 @@ async def add_product(
     product_description: str = Form(...),
     product_is_active: bool = Form(False)
 ) -> dict:
-    repo = GoogleSheetsRepository.get_repo("products")
-    product = Product(
+    service = build_product_service()
+    return service.add_product(
         product_id=product_id,
         product_key=product_key,
         product_display_name=product_display_name,
         product_description=product_description,
         product_is_active=product_is_active
     )
-    repo.save(product.to_dict())
-    return {"status": "success"}
-
 
 #
 # Inventory
 #
-
-def build_inventory_service() -> InventoryService:
-    connector = GoogleSheetsConnector("Pickles DB")
-    inventory_repo = GoogleSheetsRepository(connector, "inventory")
-    return InventoryService(inventory_repo)
-
 
 @app.post("/api/inventory/add")
 async def add_to_stock(
@@ -112,17 +100,9 @@ async def reduce_stock(
     service = build_inventory_service()
     return service.reduce_stock(product_id, quantity)
 
-
 #
 # Orders
 #
-
-def build_order_service() -> OrderService:
-    connector = GoogleSheetsConnector("Pickles DB")
-    customers_repo = GoogleSheetsRepository(connector, "customers")
-    orders_repo = GoogleSheetsRepository(connector, "orders")
-    return OrderService(orders_repo, customers_repo)
-
 
 @app.post("/api/orders/add")
 async def add_order(
