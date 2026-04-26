@@ -9,7 +9,6 @@ from src.models import Product, Order, Inventory, Customer
 
 class ProductService:
     """Service for handling product-related operations."""
-
     def __init__(self, repo: Any) -> None:
         self.repo = repo
 
@@ -52,17 +51,7 @@ class OrderService:
         customer_id: int,
         is_delivery: bool
     ) -> dict:
-        """
-        Place a new order and save it to the repository.
-
-        Args:
-            product_id: ID of the product to order.
-            quantity: Quantity of the product.
-            customer_id: ID of the customer placing the order.
-            is_delivery: True if delivery, False if pickup.
-        Returns:
-            dict: Status and order ID.
-        """
+        """Place a new order and save it to the repository."""
         vienna_tz = ZoneInfo("Europe/Vienna")
         now = datetime.now(vienna_tz)
         order_id = int(now.timestamp() * 1000)
@@ -78,24 +67,12 @@ class OrderService:
         return {"status": "success", "order_id": order_id}
 
     def list_orders(self) -> List[Dict[str, Any]]:
-        """
-        List all orders from the repository.
-
-        Returns:
-            List of order records.
-        """
+        """List all orders from the repository."""
         return self.orders_repo.load()
 
     @staticmethod
     def order_to_dict(order: 'Order') -> dict:
-        """
-        Convert an Order object to a dictionary for storage.
-
-        Args:
-            order: The Order instance.
-        Returns:
-            dict: Dictionary representation of the order.
-        """
+        """Convert an Order object to a dictionary for storage."""
         return {
             "order_id": order.order_id,
             "product_id": order.product_id,
@@ -106,15 +83,7 @@ class OrderService:
         }
 
     def find_or_register_customer(self, name: str, email: str) -> Customer:
-        """
-        Find a customer by email or register a new one if not found.
-
-        Args:
-            name: Customer name.
-            email: Customer email.
-        Returns:
-            Customer: Customer instance.
-        """
+        """Find a customer by email or register a new one if not found."""
         customers = self.customers_repo.load()
         for c in customers:
             if c.get("customer_email") == email:
@@ -133,18 +102,7 @@ class OrderService:
         customer_email: str,
         is_delivery: bool
     ) -> dict:
-        """
-        Place an order for a customer, registering them if needed.
-
-        Args:
-            product_id: ID of the product to order.
-            quantity: Quantity of the product.
-            customer_name: Name of the customer.
-            customer_email: Email of the customer.
-            is_delivery: True if delivery, False if pickup.
-        Returns:
-            dict: Status and order ID.
-        """
+        """Place an order for a customer, registering them if needed."""
         customer = self.find_or_register_customer(customer_name, customer_email)
         return self.place_order(
             product_id,
@@ -155,26 +113,12 @@ class OrderService:
 
 
 class InventoryService:
-    """
-    Service layer for inventory operations. Handles business logic
-    and delegates persistence to the repository.
-    """
+    """Service layer for inventory operations."""
     def __init__(self, repo: Any) -> None:
-        """
-        Initialize InventoryService with a repository.
-
-        Args:
-            repo: Repository for inventory data.
-        """
         self.repo = repo
 
     def load_inventory(self) -> Inventory:
-        """
-        Load inventory data and return as an Inventory object.
-
-        Returns:
-            Inventory: Inventory instance with current quantities.
-        """
+        """Load inventory data and return as an Inventory object."""
         inventory_data = self.repo.load()
         quantities = {
             int(row["product_id"]): int(row["product_quantity"])
@@ -183,16 +127,7 @@ class InventoryService:
         return Inventory(quantities)
 
     def add_stock(self, product_id: int, product_key: str, amount: int) -> dict:
-        """
-        Add stock for a product, saving or updating as needed.
-
-        Args:
-            product_id: ID of the product.
-            product_key: Key or name of the product.
-            amount: Amount to add.
-        Returns:
-            dict: Status and new quantity.
-        """
+        """Add stock for a product, saving or updating as needed."""
         inventory = self.load_inventory()
         is_new = inventory.get_stock(product_id) == 0
         inventory.add_stock(product_id, amount)
@@ -212,15 +147,7 @@ class InventoryService:
         }
 
     def reduce_stock(self, product_id: int, amount: int) -> dict:
-        """
-        Reduce stock for a product, updating the repository.
-
-        Args:
-            product_id: ID of the product.
-            amount: Amount to reduce.
-        Returns:
-            dict: Status and new quantity, or error message.
-        """
+        """Reduce stock for a product, updating the repository."""
         inventory = self.load_inventory()
         try:
             inventory.reduce_stock(product_id, amount)
