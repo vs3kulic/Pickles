@@ -2,81 +2,98 @@
 
 ## Goal
 Build a tiny pickle-order app with:
-- [x] Static HTML/Tailwind/JS frontend (no Lovable)
+- [x] Static HTML/Tailwind/JS frontend
 - [x] FastAPI backend on Render
 - [x] Google Sheets as lightweight persistence
 
 The point is to keep it fun, simple, and backend-focused.
 
-
 ## Stack
-- [x] Frontend: Static HTML/CSS/JS (Tailwind via CDN)
+- [x] Frontend: Static HTML/CSS/JS
 - [x] Backend: FastAPI, deployed to Render web service
-- [x] Persistence: Google Sheets API for orders + stock
+- [x] Persistence: Google Sheets API via `gspread`
 
-
-## v1 scope
-- [x] One page frontend
-- [x] One or two pickle products
-- [x] Simple order form
-- [ ] Minimal backend API
-- [ ] Store orders in Google Sheets
-- [ ] Track remaining jar count in Google Sheets
-
+## Current scope
+- [x] Multiple frontend pages (`/`, `/products`, `/inventory`, `/orders`)
+- [x] Product creation flow
+- [x] Inventory add/reduce flow
+- [x] Order submission flow
+- [x] Customer registration / lookup by email
+- [x] Google Sheets persistence for products, inventory, orders, and customers
+- [x] Basic service + repository layering
 
 ## Frontend
-- [x] Create static HTML/CSS/JS form
-- [x] Keep UI minimal: product, quantity, name, contact, submit
-- [ ] Add frontend call to backend `POST /orders`
-- [ ] Add simple success and error messages
-
+- [x] Static pages for landing, products, inventory, and orders
+- [x] Minimal forms for product, inventory, and order actions
+- [ ] Improve form success/error feedback
+- [ ] Add friendlier confirmation UX for order submission
+- [ ] Tighten styling / landing page polish
+- [ ] Consider simple multi-language support later
 
 ## Backend
 - [x] Create FastAPI project
-- [x] Add basic app structure
+- [x] Add app structure
 - [x] Add `GET /health`
-- [ ] Add `GET /products` (next)
-- [ ] Add `POST /orders`
-- [ ] Validate request data
-- [ ] Return clean JSON responses
-- [ ] Enable CORS for frontend domain
-- [ ] Implement class-based design (`Product`, `Order`, `Inventory`, `OrderService`, `Repository`)
-
+- [x] Add `POST /api/products/add`
+- [x] Add `POST /api/inventory/add`
+- [x] Add `POST /api/inventory/reduce`
+- [x] Add `POST /api/orders/add`
+- [x] Implement domain models (`Product`, `Order`, `Inventory`, `Customer`)
+- [x] Implement service layer (`InventoryService`, `OrderService`)
+- [x] Implement repository abstraction + Google Sheets repository
+- [x] Add `ProductService` for consistency
+- [ ] Standardize dependency wiring (`dependencies.py` / `Depends`)
+- [ ] Standardize error handling strategy
+- [ ] Return cleaner, more consistent API responses
+- [ ] Add request validation where business rules are still implicit
+- [ ] Enable CORS if frontend/backend are split across domains
 
 ## Google Sheets
-- [x] Create one spreadsheet
+- [x] Create spreadsheet
 - [x] Add `products` sheet
-- [ ] Add `orders` sheet
 - [x] Add `inventory` sheet
-- In `products`, store:
-  - [x] product_id
-  - [x] name
-  - [x] active
-- In `inventory`, store:
-  - [ ] product_id
-  - [ ] stock
-- In `orders`, store:
-  - [ ] timestamp
-  - [ ] order_id
-  - [ ] customer_name
-  - [ ] contact
-  - [ ] product_id
-  - [ ] quantity
-  - [ ] status
+- [x] Add `orders` sheet
+- [x] Add `customers` sheet
 - [x] Enable Google Sheets API in Google Cloud
-- [x] Create credentials/service account
-- [x] Share sheet with service account
-- [x] Store credentials securely in backend environment variables
+- [x] Create service account credentials
+- [x] Share spreadsheet with service account
+- [x] Store credentials via environment variable
 
+### Current sheet structure
+- `products`
+  - [x] `product_id`
+  - [x] `product_key`
+  - [x] `product_display_name`
+  - [x] `product_description`
+  - [x] `product_is_active`
+
+- `inventory`
+  - [x] `product_id`
+  - [x] `product_key`
+  - [x] `product_quantity`
+
+- `customers`
+  - [x] `customer_id`
+  - [x] `customer_name`
+  - [x] `customer_email`
+
+- `orders`
+  - [x] `order_id`
+  - [x] `product_id`
+  - [x] `quantity`
+  - [x] `customer_id`
+  - [x] `timestamp`
+  - [x] `is_delivery`
 
 ## Order flow
-- [ ] Frontend sends order to backend
-- [ ] Backend checks product exists
-- [ ] Backend checks stock is available
-- [ ] Backend appends row to `orders`
-- [ ] Backend updates stock in `products`
-- [ ] Backend returns success or out-of-stock response
-
+- [x] Frontend sends order form to backend
+- [x] Backend creates or finds customer by email
+- [x] Backend appends row to `orders`
+- [ ] Backend checks product exists before placing order
+- [ ] Backend checks stock before placing order
+- [ ] Backend reduces inventory automatically when an order is placed
+- [ ] Backend returns clearer business-error responses
+- [ ] Show success page / failure message cleanly in the UI
 
 ## Render
 - [x] Create backend repo
@@ -85,29 +102,32 @@ The point is to keep it fun, simple, and backend-focused.
 - [x] Add environment variables for Google credentials
 - [x] Deploy and test public API URL
 
-
 ## Nice-to-have later
 - [ ] Admin endpoint to list orders
-- [ ] Admin endpoint to restock jars
+- [ ] Admin endpoint to list products
+- [ ] Admin endpoint to restock inventory
+- [ ] Product activation/deactivation flow in UI
 - [ ] Basic order status handling
-- [ ] Simple auth for admin routes
-- [ ] Better form validation
-- [ ] Friendly confirmation page
-- [ ] Basic logging
-
+- [ ] Better logging
+- [ ] Unit tests for services
+- [ ] Integration tests for API routes
+- [ ] Swap Google Sheets for SQL later if useful
 
 ## Keep it simple, stupid
-- [ ] No Postgres
-- [ ] No auth in v1
-- [ ] No payments
-- [ ] No fancy inventory logic
-- [ ] No overengineering
-
+- [x] No Postgres for v1
+- [x] No auth for v1
+- [x] No payments
+- [x] No fancy inventory logic
+- [x] No overengineering
 
 ## Definition of done
-- [ ] Public frontend is live
-- [ ] Backend is live
-- [ ] User can submit pickle order
-- [ ] Order lands in Google Sheets
-- [ ] Stock count decreases correctly
-- [ ] Every function has >= 1 unit tests
+- [x] Backend is live
+- [x] User can create products
+- [x] User can manage stock manually
+- [x] User can submit pickle orders
+- [x] Order lands in Google Sheets
+- [ ] Stock count decreases automatically on order
+- [ ] Product existence is validated on order
+- [ ] Out-of-stock orders are blocked
+- [ ] Core service functions have unit tests
+- [ ] Frontend is polished enough to share without apology
