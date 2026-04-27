@@ -3,6 +3,7 @@
 
 import os
 from fastapi import FastAPI, Form, HTTPException
+from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
 from src.dependencies import build_product_service, build_inventory_service, build_order_service
@@ -17,7 +18,6 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(__file__)
 static_dir = os.path.join(BASE_DIR, '..', 'static')
 index_path = os.path.join(static_dir, "index.html")
-products_path = os.path.join(static_dir, "products.html")
 inventory_path = os.path.join(static_dir, "inventory.html")
 orders_path = os.path.join(static_dir, "orders.html")
 success_path = os.path.join(static_dir, "success.html")
@@ -31,11 +31,6 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 @app.get("/", response_class=FileResponse)
 async def root() -> str:
     return index_path
-
-
-@app.get("/products", response_class=FileResponse)
-async def products() -> str:
-    return products_path
 
 
 @app.get("/inventory", response_class=FileResponse)
@@ -60,21 +55,39 @@ async def health() -> dict:
 # Products
 #
 
+class ProductResponse(BaseModel):
+    product_id: int
+    product_key: str
+    product_display_name: str | None = None
+    product_description: str | None = None
+    product_is_active: bool
+
+# API response will be a JSON array (list) of objects
+# Each object in the array matches the ProductResponse schema
+@app.get("/api/products", response_model=list[ProductResponse])
+async def get_products():
+    service = build_product_service()
+    product = service.list_products()
+    return product
+
+
+class ProductCreateRequest(BaseModel):
+    """Pydantic model for parsing and validating incoming API data."""
+    product_id: int
+    product_key: str
+    product_display_name: str | None = None
+    product_description: str | None = None
+    product_is_active: bool = False
+
 @app.post("/api/products/add")
-async def add_product(
-    product_id: int = Form(...),
-    product_key: str = Form(...),
-    product_display_name: str = Form(...),
-    product_description: str = Form(...),
-    product_is_active: bool = Form(False)
-) -> dict:
+async def add_product(request: ProductCreateRequest) -> dict:
     service = build_product_service()
     return service.add_product(
-        product_id=product_id,
-        product_key=product_key,
-        product_display_name=product_display_name,
-        product_description=product_description,
-        product_is_active=product_is_active
+        product_id=request.product_id,
+        product_key=request.product_key,
+        product_display_name=request.product_display_name,
+        product_description=request.product_description,
+        product_is_active=request.product_is_active
     )
 
 #
@@ -121,10 +134,7 @@ async def add_order(
         is_delivery=is_delivery,
     )
     if result.get("status") == "success":
-        return RedirectResponse(
-            url="/static/success.html",
-            status_code=303
-        )
+        return RedirectResponse(url="/static/success.html", status_code=303)
     raise HTTPException(
         status_code=400,
         detail=result.get("message", "Order could not be placed.")
