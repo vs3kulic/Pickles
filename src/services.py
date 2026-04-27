@@ -33,6 +33,14 @@ class ProductService:
     def list_products(self) -> list[dict]:
         return self.repo.load()
 
+    def get_product_by_id(self, product_id: int) -> dict | None:
+        """Return a product dict by its product_id, or None if not found."""
+        products = self.repo.load()
+        for product in products:
+            if int(product.get("product_id")) == product_id:
+                return product
+        return None
+
 
 class OrderService:
     """Service for handling order-related operations."""

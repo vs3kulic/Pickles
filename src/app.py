@@ -62,12 +62,19 @@ class ProductResponse(BaseModel):
     product_description: str | None = None
     product_is_active: bool
 
-# API response will be a JSON array (list) of objects
-# Each object in the array matches the ProductResponse schema
 @app.get("/api/products", response_model=list[ProductResponse])
 async def get_products():
     service = build_product_service()
-    product = service.list_products()
+    products = service.list_products()
+    return products
+
+
+@app.get("/api/products/{product_id}", response_model=ProductResponse)
+async def get_product_by_id(product_id: int):
+    service = build_product_service()
+    product = service.get_product_by_id(product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 
