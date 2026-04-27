@@ -5,7 +5,7 @@ import os
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
-from src.utils import build_product_service, build_inventory_service, build_order_service
+from src.dependencies import build_product_service, build_inventory_service, build_order_service
 
 #############
 # APP SETUP #
