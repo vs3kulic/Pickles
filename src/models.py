@@ -100,7 +100,6 @@ class Order:
 
 
 class Inventory:
-
     def __init__(
         self,
         quantities: dict | None = None,
