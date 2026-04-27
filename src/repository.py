@@ -7,7 +7,6 @@ import gspread
 
 
 class Repository(ABC):
-
     def __init__(self, name: str):
         self._name = name
 
@@ -31,7 +30,6 @@ class Repository(ABC):
 
 
 class GoogleSheetsConnector:
-
     def __init__(self, document: str):
         self._document = document
         gclient = self._authenticate()
@@ -58,7 +56,6 @@ class GoogleSheetsConnector:
 
 
 class GoogleSheetsRepository(Repository):
-
     def __init__(self, connector: GoogleSheetsConnector, entity: str):
         super().__init__(entity)
         self._connector = connector
