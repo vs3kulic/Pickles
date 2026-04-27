@@ -113,11 +113,19 @@ async def add_order(
     is_delivery: bool = Form(False)
 ):
     service = build_order_service()
-    service.place_order_for_email(
+    result = service.place_order_for_email(
         product_id=product_id,
         quantity=quantity,
         customer_name=customer_name,
         customer_email=customer_email,
         is_delivery=is_delivery,
     )
-    return RedirectResponse(url="/static/success.html", status_code=303)
+    if result.get("status") == "success":
+        return RedirectResponse(
+            url="/static/success.html",
+            status_code=303
+        )
+    raise HTTPException(
+        status_code=400,
+        detail=result.get("message", "Order could not be placed.")
+    )

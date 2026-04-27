@@ -60,7 +60,7 @@ class GoogleSheetsRepository(Repository):
         super().__init__(entity)
         self._connector = connector
         self._worksheet = connector.get_worksheet(entity)
-        
+
     def __str__(self) -> str:
         return ("GoogleSheetsRepository("
                 f"connector='{self._connector}', "

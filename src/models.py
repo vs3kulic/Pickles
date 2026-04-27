@@ -69,6 +69,79 @@ class Product:
         self._product_is_active = value
 
 
+class Inventory:
+    def __init__(
+        self,
+        quantities: dict | None = None,
+    ) -> None:
+        self._quantities = quantities if quantities is not None else {}
+
+    def __repr__(self):
+        return f"Inventory(quantities={self._quantities})"
+
+    def add_stock(self, product_id: int, amount: int) -> None:
+        self._quantities[product_id] = (
+            self._quantities.get(product_id, 0) + amount
+    )
+
+    def get_stock(self, product_id: int) -> int:
+        return self._quantities.get(product_id, 0)
+
+    def reduce_stock(self, product_id: int, amount: int = 1) -> None:
+        if product_id not in self._quantities:
+            raise KeyError(f"Product {product_id} not found in inventory.")
+        if self._quantities[product_id] < amount:
+            raise ValueError(f"Not enough stock for product {product_id}.")
+        self._quantities[product_id] -= amount
+
+    def list_inventory(self):
+        # Returns a list of (product_id, quantity) tuples
+        return list(self._quantities.items())
+
+
+class Customer:
+    def __init__(
+        self,
+        customer_id: str,
+        customer_name: str,
+        customer_email: str
+    ) -> None:
+        self._customer_id = customer_id
+        self._customer_name = customer_name
+        self._customer_email = customer_email
+
+    @property
+    def customer_id(self) -> str:
+        return self._customer_id
+
+    @property
+    def customer_name(self) -> str:
+        return self._customer_name
+
+    @property
+    def customer_email(self) -> str:
+        return self._customer_email
+
+    @staticmethod
+    def register_customer(name, email, repo):
+        customer_id = "customer_" + uuid.uuid4().hex[:8]
+        now = datetime.now(ZoneInfo("Europe/Vienna"))
+        customer = Customer(
+            customer_id=customer_id,
+            customer_name=name,
+            customer_email=email
+        )
+        repo.save(customer.to_dict())
+        return customer
+
+    def to_dict(self):
+        return {
+            "customer_id": self.customer_id,
+            "customer_name": self.customer_name,
+            "customer_email": self.customer_email,
+        }
+
+
 @dataclass(frozen=True)
 class Order:
     order_id: int
@@ -98,58 +171,3 @@ class Order:
             f"Delivery:     {self.is_delivery}\n"
         )
 
-
-class Inventory:
-    def __init__(
-        self,
-        quantities: dict | None = None,
-    ):
-        self._quantities = quantities if quantities is not None else {}
-
-    def __repr__(self):
-        return f"Inventory(quantities={self._quantities})"
-
-    def add_stock(self, product_id: int, amount: int) -> None:
-        self._quantities[product_id] = (
-            self._quantities.get(product_id, 0) + amount
-    )
-
-    def get_stock(self, product_id: int) -> int:
-        return self._quantities.get(product_id, 0)
-
-    def reduce_stock(self, product_id: int, amount: int = 1) -> None:
-        if product_id not in self._quantities:
-            raise KeyError(f"Product {product_id} not found in inventory.")
-        if self._quantities[product_id] < amount:
-            raise ValueError(f"Not enough stock for product {product_id}.")
-        self._quantities[product_id] -= amount
-
-    def list_inventory(self):
-        # Returns a list of (product_id, quantity) tuples
-        return list(self._quantities.items())
-
-
-@dataclass(frozen=True)
-class Customer:
-    customer_id: str
-    customer_name: str
-    customer_email: str
-
-    @staticmethod
-    def register_customer(name, email, repo):
-        customer_id = "customer_" + uuid.uuid4().hex[:8]
-        now = datetime.now(ZoneInfo("Europe/Vienna"))
-        customer = Customer(
-            customer_id=customer_id,
-            customer_name=name,
-            customer_email=email
-        )
-        repo.save(customer.to_dict())
-        return customer
-
-    def to_dict(self):
-        return {
-            "customer_id": self.customer_id,
-            "customer_name": self.customer_name,
-            "customer_email": self.customer_email,
-        }
